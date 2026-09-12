@@ -1,21 +1,109 @@
-MIT License
+ByteKibble Source-Available Noncommercial License 1.0
+License identifier: LicenseRef-ByteKibble-NC-1.0
+Copyright (c) 2026 Mustundead
+Produced by Mustundead's MU Labs
+https://mustundead.com
 
-Copyright (c) 2026 mustundead
+1. Scope and transition
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This license applies to original ByteKibble material first distributed by
+Mustundead under this license, beginning with the repository commit that
+introduces this license on 2026-09-12. "Software" means that covered code,
+documentation and accompanying assets, including modifications to it.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This is a prospective change. Material already distributed under the MIT
+License remains available under that license, including its commercial-use
+permissions. This license does not revoke, narrow or replace those existing
+permissions, even when that material is included in a later version.
+The prior MIT text is preserved in LICENSES/MIT-legacy.txt. Material published
+through commit 09988c7fd1ed677191a2d8ebbceb932d11de1393 and the previously
+supplied 1.2.0 (41) acceptance package retain their prior MIT terms.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Third-party material and material with its own license notice are governed
+by their respective licenses. This license grants only rights that
+Mustundead is entitled to grant.
+
+2. Noncommercial permission
+
+Subject to this license, permission is granted, free of charge, to use,
+study, reproduce, modify and redistribute the Software, in source or binary
+form, solely for noncommercial purposes.
+
+"Noncommercial" means not primarily intended for or directed toward
+commercial advantage or monetary compensation. Personal learning, personal
+use and noncommercial research are examples when they meet that definition.
+
+3. Commercial use requires prior written authorization
+
+No commercial-use permission is granted by this license. Obtain written
+authorization from Mustundead before commercial use, including sale of the
+Software, inclusion in a commercial product, or use to provide a paid or
+advertising-supported service.
+
+Contact Mustundead through https://mustundead.com to request authorization.
+Submitting a request or receiving no response does not constitute consent.
+Any commercial permission is governed by the separate written agreement.
+The permissions for previously MIT-licensed material in section 1 remain
+unaffected.
+
+4. Copyright, license and attribution
+
+Every redistributed copy or substantial portion of the Software, whether
+modified or unmodified, must retain this license and all applicable
+copyright and third-party notices.
+
+When copying, adapting or incorporating covered code into another project,
+include the following attribution in its README, documentation, or another
+reasonably accessible attribution or legal-notices location distributed
+with the project:
+
+  ByteKibble (字节猫粮 / 字節貓糧)
+  By Mustundead / MU Labs
+  https://mustundead.com
+  Source: https://github.com/mustundead/ByteKibble
+
+For distributed binaries, include the same attribution and license in
+accompanying documentation or a reasonably accessible credits/legal-notices
+screen. Attribution is also required for redistributed substantial code
+excerpts. Mark modifications as your own and do not imply endorsement by
+Mustundead or MU Labs.
+
+5. Redistribution and separate rights
+
+Redistribution of covered Software must preserve these noncommercial and
+attribution terms for the covered portions. You may license your independent
+contributions separately, but may not grant rights to covered portions
+beyond those you have received.
+
+This license does not require publication of private modifications and does
+not require independently written code merely used alongside the Software
+to adopt this license. Nothing here limits rights that applicable law grants
+without the copyright holder's permission.
+
+6. Names and marks
+
+No right to use the names, logos or other marks of Mustundead, MU Labs or
+ByteKibble as your own branding, or to suggest endorsement, is granted.
+Accurate attribution required by section 4 is permitted.
+
+7. Termination
+
+A material breach ends permissions granted under this license. If you cure
+the breach within 30 days after first learning of it, those permissions are
+automatically reinstated unless Mustundead has previously notified you of a
+breach of this license. Otherwise, reinstatement requires written permission.
+This section does not terminate separate rights under the legacy MIT license.
+
+8. Disclaimer
+
+To the extent permitted by applicable law, the Software is provided as is,
+without warranties of any kind, including merchantability, fitness for a
+particular purpose and noninfringement. Mustundead and other copyright holders
+are not liable for claims, damages or other liability arising from use of or
+inability to use the Software, whether in contract, tort or otherwise.
+
+9. Interpretation
+
+This is a source-available license with a noncommercial restriction, not an
+OSI-approved open-source license. The English text of this file controls;
+README translations are summaries, not alternative license grants.

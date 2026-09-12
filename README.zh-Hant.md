@@ -84,10 +84,12 @@ swift build -c release
 
 ## 回饋與授權
 
-透過 [Issues](https://github.com/mustundead/ByteKibble/issues) 回報問題，請附上 macOS 版本、App 版本、用戶端名稱與去識別化的重現步驟。專案採用 [MIT 授權條款](LICENSE)。
+透過 [Issues](https://github.com/mustundead/ByteKibble/issues) 回報問題，請附上 macOS 版本、App 版本、用戶端名稱與去識別化的重現步驟。後續首次依新授權發布的原創內容採用[原始碼公開、非商業授權](LICENSE)：非商用免費，商用須事先取得 Mustundead 的書面授權。因含商業用途限制，不再稱為標準開放原始碼授權。
 
 ### 作者與程式碼署名
 
 個人網站：[mustundead.com](https://mustundead.com)。由 Mustundead 的 MU Labs 出品。
 
-重用程式碼時，須依現有 MIT 授權條款保留原有版權聲明及授權文字。引用本專案時，也請註明「字節貓糧（ByteKibble）— Mustundead / MU Labs」，並附上[專案網址](https://github.com/mustundead/ByteKibble)。
+重用新授權涵蓋的程式碼時，須保留版權與授權文字，並註明「字節貓糧（ByteKibble）— Mustundead / MU Labs」、個人網站及[專案網址](https://github.com/mustundead/ByteKibble)。具體範圍與署名位置見 [LICENSE](LICENSE)。商業授權請透過[個人網站](https://mustundead.com)聯絡；提出申請不等於獲准。
+
+**不追溯既有授權。** 先前依 MIT 提供的程式碼與版本（包括 1.2.0（41）驗收包）仍適用[原 MIT 授權](LICENSES/MIT-legacy.txt)，既有商用權利不受影響。本次只更新授權與文件，不上傳新應用程式碼或安裝包。

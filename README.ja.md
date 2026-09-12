@@ -84,10 +84,12 @@ swift build -c release
 
 ## フィードバックとライセンス
 
-[Issues](https://github.com/mustundead/ByteKibble/issues) に macOS とアプリのバージョン、クライアント名、機密情報を除いた再現手順をお知らせください。[MIT ライセンス](LICENSE)で公開しています。
+[Issues](https://github.com/mustundead/ByteKibble/issues) に macOS とアプリのバージョン、クライアント名、機密情報を除いた再現手順をお知らせください。今後、新しい条件で初めて配布する独自の成果物には[ソース公開・非商用ライセンス](LICENSE)を適用します。非商用利用は無料、商用利用には Mustundead の事前の書面による許可が必要です。商用制限があるため、標準的なオープンソースライセンスとは呼びません。
 
 ### 作者とクレジット
 
 個人サイト：[mustundead.com](https://mustundead.com)。Mustundead の MU Labs が制作しています。
 
-コードを再利用する際は、現行の MIT ライセンスに従い、元の著作権表示とライセンス文を保持してください。本プロジェクトを引用する際は、「ByteKibble — Mustundead / MU Labs」と明記し、[リポジトリへのリンク](https://github.com/mustundead/ByteKibble)も添えてください。
+新ライセンスの対象コードを再利用する場合は、著作権表示とライセンス文を保持し、「ByteKibble — Mustundead / MU Labs」、個人サイト、[リポジトリ](https://github.com/mustundead/ByteKibble)を明記してください。対象範囲と表示場所は [LICENSE](LICENSE) をご確認ください。商用許可は[個人サイト](https://mustundead.com)からお問い合わせください。申請だけでは許可になりません。
+
+**過去の許諾は変更しません。** 以前 MIT で提供したコードとバージョン（1.2.0（41）の確認用パッケージを含む）には、商用利用の権利を含めて[従来の MIT 条件](LICENSES/MIT-legacy.txt)が引き続き適用されます。今回はライセンス文書と README のみを更新し、新しいアプリコードやインストーラはアップロードしません。
