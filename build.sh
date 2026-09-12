@@ -14,7 +14,12 @@ echo "$BUILD_NUM" > .buildnumber
 
 echo "==> 生成图标"
 mkdir -p Resources/icon.iconset
-swift Resources/make_icon.swift Resources/icon.iconset >/dev/null 2>&1 || echo "图标生成失败，跳过（不影响功能）"
+# 图标源：Resources/AppIcon.icon（Icon Composer）内嵌的浅色图 + 品牌SVG，不再手绘
+if [ -f Resources/icon_light_1024.png ]; then
+    sips -z 1024 1024 Resources/icon_light_1024.png --out Resources/icon.iconset/icon_512x512@2x.png >/dev/null 2>&1
+else
+    swift Resources/make_icon.swift Resources/icon.iconset >/dev/null 2>&1 || true
+fi
 if [ -f Resources/icon.iconset/icon_1024.png ]; then
     sips -z 16 16     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16.png     >/dev/null
     sips -z 32 32     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16@2x.png  >/dev/null
@@ -69,6 +74,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
     <key>CFBundleIconFile</key><string>AppIcon</string>
+    <key>ASACatalogAssets</key><string>AppIcon</string>
     <key>NSHumanReadableCopyright</key><string>ByteKibble — Traffic monitor designed for Clash, Mihomo, SNTP</string>
 </dict>
 </plist>
@@ -76,6 +82,8 @@ PLIST
 echo -n "APPL????" > "$APP/Contents/PkgInfo"
 
 [ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+# macOS 26 Icon Composer 图标（Liquid Glass + 明暗切换）
+[ -d Resources/AppIcon.icon ] && cp -R Resources/AppIcon.icon "$APP/Contents/Resources/"
 
 # SPM 资源包（Bundle.module 依赖，缺了会启动即崩）
 RES_BUNDLE=".build-arm/out/Products/Release/${APP_NAME}_${APP_NAME}.bundle"
