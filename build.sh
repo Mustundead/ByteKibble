@@ -15,11 +15,18 @@ echo "$BUILD_NUM" > .buildnumber
 echo "==> 生成图标"
 mkdir -p Resources/icon.iconset
 # 图标源：Resources/AppIcon.icon（Icon Composer）内嵌的浅色图 + 品牌SVG，不再手绘
-if [ -f Resources/icon_light_1024.png ]; then
-    sips -z 1024 1024 Resources/icon_light_1024.png --out Resources/icon.iconset/icon_512x512@2x.png >/dev/null 2>&1
-else
-    swift Resources/make_icon.swift Resources/icon.iconset >/dev/null 2>&1 || true
-fi
+rm -rf Resources/icon.iconset && mkdir -p Resources/icon.iconset
+python3 - <<'PYEOF'
+import subprocess, os
+src = "Resources/icon_light_1024.png"
+sizes = [(16,16,"icon_16x16.png"), (32,32,"icon_16x16@2x.png"), (32,32,"icon_32x32.png"),
+         (64,64,"icon_32x32@2x.png"), (128,128,"icon_128x128.png"), (256,256,"icon_128x128@2x.png"),
+         (256,256,"icon_256x256.png"), (512,512,"icon_256x256@2x.png"), (512,512,"icon_512x512.png"),
+         (1024,1024,"icon_512x512@2x.png")]
+for h, w, name in sizes:
+    subprocess.run(["sips", "-z", str(h), str(w), src, "--out", os.path.join("Resources/icon.iconset", name)], capture_output=True)
+PYEOF
+iconutil -c icns Resources/icon.iconset -o Resources/AppIcon.icns
 if [ -f Resources/icon.iconset/icon_1024.png ]; then
     sips -z 16 16     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16.png     >/dev/null
     sips -z 32 32     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16@2x.png  >/dev/null
