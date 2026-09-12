@@ -485,6 +485,9 @@ struct MenuView: View {
                 .glassCard(in: Capsule())
             }
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard(in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     // MARK: 主卡片：剩余流量大数字 + 渐变进度条
