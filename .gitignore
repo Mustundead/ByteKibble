@@ -1,0 +1,8 @@
+.build/
+.build-arm/
+.build-x64/
+dist/
+.DS_Store
+*.dSYM
+Resources/icon.iconset/
+.buildnumber

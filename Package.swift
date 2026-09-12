@@ -1,0 +1,21 @@
+// swift-tools-version:5.9
+import PackageDescription
+
+let package = Package(
+    name: "ByteKibble",
+    defaultLocalization: "zh-Hans",
+    platforms: [.macOS(.v13)],
+    targets: [
+        .executableTarget(
+            name: "ByteKibble",
+            path: "Sources/ByteKibble",
+            resources: [
+                .copy("Resources/catfood.svg"),
+                .copy("Resources/en.lproj"),
+                .copy("Resources/zh-Hant.lproj"),
+                .copy("Resources/ja.lproj"),
+                .copy("Resources/ko.lproj")
+            ]
+        )
+    ]
+)
