@@ -104,10 +104,10 @@ final class ViewModel: ObservableObject {
     func countdownText(days: Int, now: Date) -> String {
         let target = Calendar.current.startOfDay(for: now).addingTimeInterval(TimeInterval(days) * 86400)
         let d = target.timeIntervalSince(now)
-        if d <= 0 { return "今天" }
-        if d > 86400 { return "\(Int(ceil(d / 86400)))天" }
-        if d > 3600 { return "\(Int(d / 3600))小时" }
-        return "\(max(1, Int(d / 60)))分钟"
+        if d <= 0 { return L10n.today }
+        if d > 86400 { return L10n.cdDays(Int(ceil(d / 86400))) }
+        if d > 3600 { return L10n.cdHours(Int(d / 3600)) }
+        return L10n.cdMinutes(max(1, Int(d / 60)))
     }
 
     /// 菜单栏/面板预警等级
