@@ -1,11 +1,9 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/app-icon-dark.png">
-    <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: 발바닥 무늬가 있는 따뜻한 금빛 사료 봉투">
-  </picture>
+  <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: 발바닥 무늬가 있는 따뜻한 금빛 사료 봉투">
 </p>
 
 <h1 align="center">ByteKibble</h1>
+<p align="center"><a href="https://mustundead.com">Mustundead의 MU Labs</a> 제작</p>
 <p align="center">구독 데이터 잔여량을 한눈에.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · 한국어 · <a href="README.ja.md">日本語</a></p>
 
@@ -87,3 +85,9 @@ swift build -c release
 ## 피드백과 라이선스
 
 [Issues](https://github.com/mustundead/ByteKibble/issues)에 macOS 버전, 앱 버전, 클라이언트 이름, 민감한 정보를 가린 재현 절차를 남겨 주세요. [MIT 라이선스](LICENSE)로 배포됩니다.
+
+### 제작자와 출처 표기
+
+개인 홈페이지: [mustundead.com](https://mustundead.com). Mustundead의 MU Labs에서 제작했습니다.
+
+코드를 재사용할 때는 현행 MIT 라이선스에 따라 원래 저작권 고지와 라이선스 전문을 유지해야 합니다. 이 프로젝트를 인용할 때는 “ByteKibble — Mustundead / MU Labs”를 표기하고 [저장소 링크](https://github.com/mustundead/ByteKibble)도 함께 남겨 주세요.

@@ -1,11 +1,9 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/app-icon-dark.png">
-    <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble：肉球マーク入りの暖かなゴールドのフードバッグ">
-  </picture>
+  <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble：肉球マーク入りの暖かなゴールドのフードバッグ">
 </p>
 
 <h1 align="center">ByteKibble</h1>
+<p align="center"><a href="https://mustundead.com">Mustundead の MU Labs</a> が制作</p>
 <p align="center">サブスクリプションの残り通信量を、ひと目で。</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · 日本語</p>
 
@@ -87,3 +85,9 @@ swift build -c release
 ## フィードバックとライセンス
 
 [Issues](https://github.com/mustundead/ByteKibble/issues) に macOS とアプリのバージョン、クライアント名、機密情報を除いた再現手順をお知らせください。[MIT ライセンス](LICENSE)で公開しています。
+
+### 作者とクレジット
+
+個人サイト：[mustundead.com](https://mustundead.com)。Mustundead の MU Labs が制作しています。
+
+コードを再利用する際は、現行の MIT ライセンスに従い、元の著作権表示とライセンス文を保持してください。本プロジェクトを引用する際は、「ByteKibble — Mustundead / MU Labs」と明記し、[リポジトリへのリンク](https://github.com/mustundead/ByteKibble)も添えてください。

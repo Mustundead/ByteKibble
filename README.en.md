@@ -1,11 +1,9 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/app-icon-dark.png">
-    <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: a warm gold kibble bag with a paw mark">
-  </picture>
+  <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: a warm gold kibble bag with a paw mark">
 </p>
 
 <h1 align="center">ByteKibble</h1>
+<p align="center">Made by <a href="https://mustundead.com">MU Labs, by Mustundead</a></p>
 <p align="center">Your subscription allowance, at a glance.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · English · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
@@ -87,3 +85,9 @@ There are no third-party runtime dependencies. A successful source build does no
 ## Feedback and license
 
 Report problems in [Issues](https://github.com/mustundead/ByteKibble/issues) with your macOS version, app version, client name and redacted reproduction steps. Licensed under the [MIT License](LICENSE).
+
+### Author and attribution
+
+Personal website: [mustundead.com](https://mustundead.com). Made by Mustundead's MU Labs.
+
+When reusing code, retain the original copyright notice and license text as required by the existing MIT License. When referencing this project, please also credit “ByteKibble — Mustundead / MU Labs” and link to [this repository](https://github.com/mustundead/ByteKibble).

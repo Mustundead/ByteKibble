@@ -1,11 +1,9 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/app-icon-dark.png">
-    <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="字节猫粮：印有猫爪的暖金色粮袋图标">
-  </picture>
+  <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="字节猫粮：印有猫爪的暖金色粮袋图标">
 </p>
 
 <h1 align="center">字节猫粮 · ByteKibble</h1>
+<p align="center">由 <a href="https://mustundead.com">Mustundead 的 MU Labs</a> 出品</p>
 <p align="center">订阅流量，抬眼就见。</p>
 <p align="center">简体中文 · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
@@ -87,3 +85,9 @@ swift build -c release
 ## 反馈与许可
 
 通过 [Issues](https://github.com/mustundead/ByteKibble/issues) 反馈问题，请附 macOS 版本、应用版本、客户端名称和脱敏后的复现步骤。项目使用 [MIT 许可证](LICENSE)。
+
+### 作者与代码署名
+
+个人主页：[mustundead.com](https://mustundead.com)。由 Mustundead 的 MU Labs 出品。
+
+复用代码时，须按现有 MIT 许可证保留原有版权声明及许可文本。引用本项目时，也请注明「字节猫粮（ByteKibble）— Mustundead / MU Labs」，并附上[项目地址](https://github.com/mustundead/ByteKibble)。
