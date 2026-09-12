@@ -416,6 +416,35 @@ extension View {
 
 // MARK: - 面板
 
+
+/// 服务端运营文案里的 emoji → SF Symbol 自动转义（👑 Premium → 皇冠图标 + Premium）
+enum EmojiIcon {
+    private static let map: [(emoji: String, symbol: String)] = [
+        ("👑", "crown.fill"),
+        ("⭐️", "star.fill"), ("⭐", "star.fill"), ("🌟", "star.fill"),
+        ("🔥", "flame.fill"),
+        ("⚡️", "bolt.fill"), ("⚡", "bolt.fill"),
+        ("💎", "diamond.fill"),
+        ("❤️", "heart.fill"), ("❤", "heart.fill"),
+        ("🚀", "rocket.fill"),
+        ("🏆", "trophy.fill"),
+        ("🎯", "target"),
+        ("🏁", "flag.checkered"),
+    ]
+
+    /// 返回 (首个命中 emoji 对应的 SF Symbol, 去除 emoji 后的文案)
+    static func interpret(_ text: String) -> (symbol: String?, text: String) {
+        var symbol: String?
+        var rest = text
+        for (emoji, sym) in map where rest.contains(emoji) {
+            if symbol == nil { symbol = sym }
+            rest = rest.replacingOccurrences(of: emoji, with: "")
+        }
+        let trimmed = rest.trimmingCharacters(in: .whitespaces)
+        return (symbol, trimmed.isEmpty ? text : trimmed)
+    }
+}
+
 struct MenuView: View {
     @ObservedObject var vm: ViewModel
     @State private var customURL = ""
@@ -463,9 +492,17 @@ struct MenuView: View {
     private func header(t: SubTarget, s: QuotaSample) -> some View {
         HStack(alignment: .center, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(s.planName ?? t.name)
-                    .font(.title3.bold())
-                    .lineLimit(1)
+                HStack(spacing: 5) {
+                    let title = EmojiIcon.interpret(s.planName ?? t.name)
+                    if let sym = title.symbol {
+                        Image(systemName: sym)
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(vm.warningLevel.color)
+                    }
+                    Text(title.text)
+                        .font(.title3.bold())
+                        .lineLimit(1)
+                }
                 Text("\(originDisplay(t.origin)) · \(s.source.displayName)")
                     .font(.callout)
                     .foregroundStyle(.secondary)
