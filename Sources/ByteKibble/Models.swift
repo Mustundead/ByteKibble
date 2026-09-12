@@ -5,6 +5,8 @@ struct QuotaSample: Equatable {
     enum Source: String {
         case cache = "客户端缓存"
         case live = "实时查询"
+
+        var displayName: String { L10n.t(rawValue) }
     }
 
     var uploaded: Int64

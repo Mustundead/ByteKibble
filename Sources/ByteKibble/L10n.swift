@@ -36,6 +36,8 @@ enum L10n {
     static func total(_ v: String) -> String { f("总量 %@", v) }
     static func daysAfter(_ s: String) -> String { f("%@后", s) }
     static func inDays(_ n: Int) -> String { f("%@ 天后", "\(n)") }
+    static func inHours(_ n: Int) -> String { f("%@ 小时后", "\(n)") }
+    static func inMinutes(_ n: Int) -> String { f("%@ 分钟后", "\(n)") }
     static func cdDays(_ n: Int) -> String { f("%@天", "\(n)") }
     static func cdHours(_ n: Int) -> String { f("%@小时", "\(n)") }
     static func cdMinutes(_ n: Int) -> String { f("%@分钟", "\(n)") }

@@ -466,7 +466,7 @@ struct MenuView: View {
                 Text(s.planName ?? t.name)
                     .font(.title3.bold())
                     .lineLimit(1)
-                Text("\(originDisplay(t.origin)) · \(s.source.rawValue)")
+                Text("\(originDisplay(t.origin)) · \(s.source.displayName)")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -546,10 +546,7 @@ struct MenuView: View {
             tile(icon: "arrow.clockwise",
                  label: L10n.resetTile,
                  value: s.resetDay.map { Fmt.date(Fmt.nextReset(days: $0) ?? Date()) } ?? "—",
-                 sub: s.resetDay.map { rd -> String in
-                     let cd = vm.countdownText(days: rd, now: vm.now)
-                     return cd == L10n.today ? L10n.resetToday : L10n.daysAfter(cd)
-                 })
+                 sub: s.resetDay.map { vm.resetSubText(days: $0, now: vm.now) })
             tile(icon: "calendar",
                  label: L10n.expireTile,
                  value: s.expireAt.map { Fmt.date($0) } ?? "—",

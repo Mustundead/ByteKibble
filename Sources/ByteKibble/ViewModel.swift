@@ -91,6 +91,16 @@ final class ViewModel: ObservableObject {
     /// 倒计时显示规则：天 > 小时 > 分钟。
     /// reset_day 是「距重置的天数」（按日历日差），重置时刻按重置日的零点计算；
     /// 剩余超过 24h 用向上取整的天数（与官方客户端口径一致），不足 1 天显示小时，不足 1 小时显示分钟。
+    /// 重置磁贴副标题：整句本地化（天/小时/分钟各自整句，不做跨语言拼接）
+    func resetSubText(days: Int, now: Date) -> String {
+        let target = Calendar.current.startOfDay(for: now).addingTimeInterval(TimeInterval(days) * 86400)
+        let d = target.timeIntervalSince(now)
+        if d <= 0 { return L10n.resetToday }
+        if d > 86400 { return L10n.inDays(Int(ceil(d / 86400))) }
+        if d > 3600 { return L10n.inHours(Int(d / 3600)) }
+        return L10n.inMinutes(max(1, Int(d / 60)))
+    }
+
     func countdownText(days: Int, now: Date) -> String {
         let target = Calendar.current.startOfDay(for: now).addingTimeInterval(TimeInterval(days) * 86400)
         let d = target.timeIntervalSince(now)
