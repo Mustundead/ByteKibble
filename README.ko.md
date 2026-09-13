@@ -1,3 +1,5 @@
+> **build 49**: Stash, Clash, Surge, Hiddify, Loon, sing-box 가져오기 링크 분석을 추가했습니다. [호환 범위 및 제한](docs/client-compatibility.md). 자동 탐지는 추가하지 않으며 사용량 표시는 제공업체 데이터에 따라 달라집니다.
+
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: 발바닥 무늬가 있는 따뜻한 금빛 사료 봉투">
 </p>
@@ -9,7 +11,7 @@
 
 ByteKibble은 **잔여 데이터, 사용량, 구독 만료일 및 초기화 알림**을 확인하는 macOS 메뉴 막대 앱입니다. 지원되는 Clash 계열 클라이언트와 SNTP의 구독을 자동으로 찾고, Quantumult / Quantumult X와 Surge에서 사용하는 HTTPS 구독 링크를 직접 추가할 수 있으며 Shadowsocks SIP008 사용량 필드를 읽습니다. 표시되는 정보는 제공업체가 반환하는 데이터에 따라 달라집니다. 자세한 조건은 아래 호환 범위를 확인하세요.
 
-> **1.2.0 (47) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). `preview/`의 이미지는 과거 버전입니다.
+> **1.2.0 (49) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49). `preview/`의 이미지는 과거 버전입니다.
 
 **앱 내 업데이트(build 47부터):** 하단 버전 번호에서 업데이트를 확인하거나 자동 확인을 끌 수 있습니다. 설치에는 사용자 확인이 필요합니다. build 46 이하는 먼저 한 번 수동으로 업데이트해야 합니다. 업데이트 확인은 GitHub에 연결하지만 구독 링크나 사용량은 전송하지 않습니다. 미리 보기 버전은 별도 업데이트 피드를 사용합니다.
 
@@ -66,7 +68,7 @@ ByteKibble이 모든 네트워크 트래픽을 직접 측정하는 것은 아닙
 
 **macOS 13 이상**이 필요합니다. 네이티브 Liquid Glass 스타일은 macOS 26 이상에서 사용하며 이전 시스템에서는 호환 스타일을 사용합니다. 프로세서 지원, 서명, 공증 여부는 각 패키지의 릴리스 설명을 확인하세요.
 
-[1.2.0 (47) 릴리스 페이지](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)에서 DMG 또는 ZIP을 받으세요. 이전 버전을 종료한 뒤 DMG의 ByteKibble을 Applications로 드래그하거나 ZIP을 풀어 앱을 “응용 프로그램”으로 옮기세요. 디스크 안의 복사본이 아닌 “응용 프로그램”에서 실행하세요. 처음 사용할 때 환영 화면이 표시됩니다.
+[1.2.0 (49) 릴리스 페이지](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49)에서 DMG 또는 ZIP을 받으세요. 이전 버전을 종료한 뒤 DMG의 ByteKibble을 Applications로 드래그하거나 ZIP을 풀어 앱을 “응용 프로그램”으로 옮기세요. 디스크 안의 복사본이 아닌 “응용 프로그램”에서 실행하세요. 처음 사용할 때 환영 화면이 표시됩니다.
 
 배포 바이너리는 **Apple silicon (arm64) 전용**이며 Intel 버전은 포함하지 않습니다. 로컬 빌드, 테스트 및 화면 확인은 macOS 27에서 수행했습니다. 최소 배포 대상은 macOS 13이지만 모든 이전 OS에서 실기기 검증을 완료했다는 의미는 아닙니다.
 

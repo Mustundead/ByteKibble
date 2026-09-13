@@ -1,3 +1,5 @@
+> **build 49**：新增 Stash、Clash、Surge、Hiddify、Loon、sing-box 匯入連結辨識。[相容範圍與限制](docs/client-compatibility.md)。此為訂閱網址解析，並非新增自動探索；流量仍取決於服務商資料。
+
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="字節貓糧：印有貓爪的暖金色糧袋圖示">
 </p>
@@ -9,7 +11,7 @@
 
 字節貓糧是一款原生 macOS 選單列訂閱流量工具，用來查看**剩餘流量、已用流量、方案到期資訊與重置提醒**。它可自動探索受支援的 Clash 系用戶端及守候網路（SNTP）訂閱，也可手動加入 Quantumult／Quantumult X、Surge 使用的 HTTPS 訂閱連結，並解析 Shadowsocks SIP008 流量欄位。可顯示的資訊取決於服務商回傳的資料，具體條件請見下方相容性說明。
 
-> **1.2.0（47）測試版**：提供應用程式碼、首次使用歡迎頁及 Apple silicon（arm64）安裝包。已使用 Developer ID 簽署，**尚未經 Apple 公證**。[下載與完整更新說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 中的舊截圖為歷史資料。
+> **1.2.0（49）測試版**：提供應用程式碼、首次使用歡迎頁及 Apple silicon（arm64）安裝包。已使用 Developer ID 簽署，**尚未經 Apple 公證**。[下載與完整更新說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49)。`preview/` 中的舊截圖為歷史資料。
 
 **App 內更新（build 47 起）**：點擊底部版本號可檢查更新或關閉自動檢查，安裝須由使用者確認。build 46 及更早版本須先手動安裝一次新版。更新檢查會連線至 GitHub，不傳送訂閱連結或流量資料；測試版使用獨立更新來源。
 
@@ -66,7 +68,7 @@
 
 需要 **macOS 13 或更新版本**。原生 Liquid Glass 樣式需要 macOS 26 或更新版本；舊系統使用相容樣式。安裝包支援的處理器架構、簽署與公證狀態，以對應版本說明為準。
 
-從 [1.2.0（47）發布頁](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47) 下載 DMG 或 ZIP。先結束舊版 App；開啟 DMG 後將 ByteKibble 拖到 Applications，或將 ZIP 解壓縮後移入「應用程式」。請從「應用程式」啟動，而非持續執行磁碟映像內的副本。首次使用會顯示歡迎頁。
+從 [1.2.0（49）發布頁](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49) 下載 DMG 或 ZIP。先結束舊版 App；開啟 DMG 後將 ByteKibble 拖到 Applications，或將 ZIP 解壓縮後移入「應用程式」。請從「應用程式」啟動，而非持續執行磁碟映像內的副本。首次使用會顯示歡迎頁。
 
 本次二進位檔僅提供 **Apple silicon（arm64）**，不含 Intel 版本。本機建置、測試與介面檢查在 macOS 27 上完成；最低部署目標為 macOS 13，不代表所有舊系統均已實機驗證。
 

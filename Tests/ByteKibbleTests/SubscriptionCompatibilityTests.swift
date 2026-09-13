@@ -2,6 +2,61 @@ import XCTest
 @testable import ByteKibble
 
 final class SubscriptionCompatibilityTests: XCTestCase {
+    func testLoonAndSingBoxDocumentedImports() throws {
+        let target = "https://example.com/sub?token=a%2Bb&x=1"
+        for (prefix, key) in [("loon://import", "sub"), ("loon://import", "nodelist"),
+                              ("sing-box://import-remote-profile", "url")] {
+            var components = URLComponents(string: prefix)!
+            components.queryItems = [URLQueryItem(name: key, value: target)]
+            XCTAssertEqual(Providers.subscriptionURL(from: components.string!), target)
+        }
+        let sample = try Fetcher.parseResponse(
+            header: "upload=1111; download=111; total=123456; expire=1614527045",
+            data: Data("opaque node subscription".utf8))
+        XCTAssertEqual(sample.remaining, 122234)
+        XCTAssertNil(sample.resetDay)
+        for input in ["loon://on", "loon://import?plugin=https://example.com/a",
+                      "loon://import?nodelist=https://example.com/a&sub=https://example.com/b",
+                      "sing-box://install-config?url=https://example.com/a",
+                      "sing-box://import-remote-profile?url=http://example.com/a"] {
+            XCTAssertNil(Providers.subscriptionURL(from: input))
+        }
+    }
+
+    func testClientImportLinksPreserveSubscriptionTokens() {
+        let target = "https://example.com/sub?token=a%2Bb&other=1"
+        for prefix in ["stash://install-config", "clash://install-config",
+                       "surge:///install-config", "surgeconfig:///install-config",
+                       "hiddify://install-config", "hiddify://install-sub"] {
+            var wrapper = URLComponents(string: prefix)!
+            wrapper.queryItems = [URLQueryItem(name: "url", value: target)]
+            XCTAssertEqual(Providers.subscriptionURL(from: wrapper.string!), target)
+        }
+        XCTAssertEqual(Providers.subscriptionURL(from: "hiddify://import/\(target)#Example"), target)
+        XCTAssertEqual(Providers.subscriptionURL(from: "https://link.stash.ws/install-config/example.com/stash.yaml"),
+                       "https://example.com/stash.yaml")
+        XCTAssertEqual(Providers.subscriptionURL(from: target), target)
+    }
+
+    func testClientActionsAndUnsafeTargetsAreRejected() {
+        for input in [
+            "stash://start", "stash://install-override?url=https://example.com/a",
+            "surge:///install-module?url=https://example.com/a",
+            "stash://install-config?url=http://example.com/a",
+            "stash://install-config?url=https://user:password@example.com/a",
+            "stash://install-config?url=https://example.com/a&url=https://example.com/b",
+            "stash://install-config/wrong?url=https://example.com/a",
+            "stash://install-config?url=stash%3A%2F%2Fstart",
+            "hiddify://import/ss://node#Example",
+            "hiddify://import/http://example.com/a",
+            "https://link.stash.ws/start",
+            "https://link.stash.ws/install-override/example.com/a",
+            "https://link.stash.ws/install-config/example.com/a?scheme=http",
+            "stash://install-config?url=https://example.com/a\nscript",
+            "vmess://node", "vless://node", "trojan://node"
+        ] { XCTAssertNil(Providers.subscriptionURL(from: input), input) }
+    }
+
     func testSurgeManagedProfileLineExtractsOnlyHTTPSURL() {
         XCTAssertEqual(Providers.subscriptionURL(from: "#!MANAGED-CONFIG https://example.com/surge.conf?token=example interval=60 strict=true"),
                        "https://example.com/surge.conf?token=example")

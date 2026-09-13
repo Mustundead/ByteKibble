@@ -1,5 +1,11 @@
 # 更新记录 / Changelog
 
+## 1.2.0（49）— 2026-09-13
+
+- 按官方文档新增 Stash、Clash、Surge、Hiddify、Loon、sing-box 配置／订阅导入链接的本地 HTTPS 地址提取；不运行客户端动作或配置。
+- 拒绝非配置导入、重复 URL 参数、HTTP 和内嵌账号密码；保留订阅 token 编码。39 项本地测试通过，未完成各客户端实机联测。
+- [客户端兼容与输入边界](docs/client-compatibility.md)。这些改动不包含在 build 47 或已提交公证的 build 48 中；build 49 为独立的 Developer ID 签名、尚未 Apple 公证的 Apple silicon 测试版。
+
 ## 1.2.0（47）— 2026-09-13
 
 - 接入 Sparkle 2.9.6：底部版本菜单提供检查更新与自动检查开关，安装仍需用户确认。

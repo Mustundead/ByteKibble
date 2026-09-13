@@ -1,3 +1,5 @@
+> **Build 49**: Stash, Clash, Surge, Hiddify, Loon and sing-box import-link parsing. [Compatibility and limitations](docs/client-compatibility.md). This does not add automatic discovery; quota availability depends on provider data.
+
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: a warm gold kibble bag with a paw mark">
 </p>
@@ -9,7 +11,7 @@
 
 ByteKibble is a native macOS menu bar app for **remaining and used data, subscription expiry, and reset reminders**. It can discover subscriptions from supported Clash-family clients and SNTP, accept manual HTTPS subscription links used with Quantumult / Quantumult X and Surge, and parse Shadowsocks SIP008 quota fields. Available readings depend on the provider's data; see the compatibility conditions below.
 
-> **1.2.0 (47) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). Images in `preview/` are historical.
+> **1.2.0 (49) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49). Images in `preview/` are historical.
 
 **In-app updates (build 47 onward):** Click the version footer to check for updates or disable automatic checks. Installation requires confirmation. Build 46 and earlier need one manual upgrade first. Checks contact GitHub without sending subscription links or quota data; previews use a separate feed.
 
@@ -66,7 +68,7 @@ ByteKibble does not measure all network activity itself. Readings depend on the 
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Download the DMG or ZIP from the [1.2.0 (47) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+Download the DMG or ZIP from the [1.2.0 (49) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
 
 This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
 

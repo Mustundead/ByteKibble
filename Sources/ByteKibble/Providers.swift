@@ -158,11 +158,49 @@ enum Providers {
         return url
     }
 
-    /// Accept the copied first line of a Surge managed profile, not its scripts or rules.
+    /// Extract a subscription address only. Never open client actions or execute configuration.
     static func subscriptionURL(from input: String) -> String? {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.contains(where: { $0.isNewline }) else { return nil }
+        if let c = URLComponents(string: text), let scheme = c.scheme?.lowercased() {
+            // Stash universal links are commands, not quota endpoints. Reject all
+            // unsupported commands rather than querying the wrapper service.
+            if scheme == "https", c.host?.lowercased() == "link.stash.ws" {
+                let prefix = "/install-config/"
+                guard c.user == nil, c.password == nil, c.port == nil,
+                      c.fragment == nil, c.query == nil,
+                      c.percentEncodedPath.hasPrefix(prefix) else { return nil }
+                let target = "https://" + c.percentEncodedPath.dropFirst(prefix.count)
+                return validatedURL(target) == nil ? nil : target
+            }
+            if ["stash", "clash", "surge", "surgeconfig", "hiddify", "sing-box", "loon"].contains(scheme) {
+                guard c.user == nil, c.password == nil, c.port == nil,
+                      !text.contains(where: { $0.isWhitespace }) else { return nil }
+                if scheme == "hiddify", c.host == "import" {
+                    // The fragment is Hiddify's display name, not part of the URL.
+                    let target = String(c.percentEncodedPath.dropFirst())
+                        + (c.percentEncodedQuery.map { "?" + $0 } ?? "")
+                    return validatedURL(target) == nil ? nil : target
+                }
+                let action = (c.host?.isEmpty == false) ? c.host! : String(c.path.dropFirst())
+                if scheme == "loon" {
+                    guard action == "import", c.path.isEmpty,
+                          let items = c.queryItems, items.count == 1,
+                          ["sub", "nodelist"].contains(items[0].name),
+                          let target = items[0].value, validatedURL(target) != nil else { return nil }
+                    return target
+                }
+                let expectedAction = scheme == "sing-box" ? "import-remote-profile" : "install-config"
+                guard (c.host?.isEmpty != false || c.path.isEmpty || c.path == "/"),
+                      action == expectedAction || (scheme == "hiddify" && action == "install-sub"),
+                      let items = c.queryItems,
+                      items.filter({ $0.name == "url" }).count == 1,
+                      let target = items.first(where: { $0.name == "url" })?.value,
+                      validatedURL(target) != nil else { return nil }
+                return target
+            }
+        }
         if validatedURL(text) != nil { return text }
-        guard !text.contains("\n"), !text.contains("\r") else { return nil }
         let parts = text.split(whereSeparator: { $0.isWhitespace })
         guard parts.count >= 2, parts[0] == "#!MANAGED-CONFIG" else { return nil }
         let url = String(parts[1])

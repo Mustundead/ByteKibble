@@ -1,3 +1,5 @@
+> **build 49**：Stash、Clash、Surge、Hiddify、Loon、sing-box のインポートリンク解析を追加。[対応範囲と制限](docs/client-compatibility.md)。自動検出の追加ではありません。通信量の表示はプロバイダーのデータに依存します。
+
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble：肉球マーク入りの暖かなゴールドのフードバッグ">
 </p>
@@ -9,7 +11,7 @@
 
 ByteKibble は、**残り通信量、使用量、契約の有効期限、リセットの予定**を確認できる macOS メニューバーアプリです。対応する Clash 系クライアントと SNTP の契約を自動検出し、Quantumult／Quantumult X、Surge で使う HTTPS サブスクリプション URL の手動追加と、Shadowsocks SIP008 の通信量フィールドに対応します。取得できる情報は提供元のデータによって異なります。詳しい条件は以下の対応範囲をご覧ください。
 
-> **1.2.0（47）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 内の画像は過去のバージョンです。
+> **1.2.0（49）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49)。`preview/` 内の画像は過去のバージョンです。
 
 **アプリ内更新（build 47 以降）：** 下部のバージョン番号から更新の確認や自動確認の無効化ができます。インストールには確認が必要です。build 46 以前は一度手動で更新してください。更新確認は GitHub に接続しますが、サブスクリプション URL や通信量は送信しません。プレビュー版は専用の更新フィードを使用します。
 
@@ -66,7 +68,7 @@ ByteKibble は**プロキシクライアント、VPN、速度測定ツール、�
 
 **macOS 13 以降**が必要です。ネイティブの Liquid Glass 表示は macOS 26 以降で利用し、古い OS では互換スタイルを使用します。対応するプロセッサ、署名、公証の状態は各パッケージのリリースノートをご確認ください。
 
- [1.2.0（47）の公開ページ](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)から DMG または ZIP を入手してください。旧版を終了し、DMG 内の ByteKibble を Applications へドラッグするか、ZIP を展開してアプリを「アプリケーション」へ移動します。ディスク内のコピーではなく「アプリケーション」から起動してください。初回使用時にウェルカム画面を表示します。
+ [1.2.0（49）の公開ページ](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49)から DMG または ZIP を入手してください。旧版を終了し、DMG 内の ByteKibble を Applications へドラッグするか、ZIP を展開してアプリを「アプリケーション」へ移動します。ディスク内のコピーではなく「アプリケーション」から起動してください。初回使用時にウェルカム画面を表示します。
 
 配布バイナリは **Apple silicon（arm64）専用**で、Intel 版は含まれません。ローカルビルド、テスト、画面確認は macOS 27 で実施しました。最小デプロイ対象は macOS 13 ですが、すべての旧 OS での実機確認を意味しません。
 
