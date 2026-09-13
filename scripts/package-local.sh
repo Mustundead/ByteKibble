@@ -24,6 +24,9 @@ candidate_dir=$(mktemp -d "$PWD/output/acceptance/$mode.XXXXXX")
 app_path="$candidate_dir/$app_name.app"
 mkdir -p "$app_path/Contents/MacOS" "$app_path/Contents/Resources"
 cp "$bin_path/ByteKibble" "$app_path/Contents/MacOS/ByteKibble"
+mkdir -p "$app_path/Contents/Frameworks"
+ditto .build-audit/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework "$app_path/Contents/Frameworks/Sparkle.framework"
+install_name_tool -add_rpath @executable_path/../Frameworks "$app_path/Contents/MacOS/ByteKibble"
 ditto "$bin_path/ByteKibble_ByteKibble.bundle" "$app_path/Contents/Resources/ByteKibble_ByteKibble.bundle"
 bash scripts/compile-icon.sh "$app_path/Contents/Resources"
 cp Resources/Installer/installer.png "$app_path/Contents/Resources/InstallerBackground.png"
@@ -31,6 +34,7 @@ cp Resources/Installer/Installation.txt "$app_path/Contents/Resources/Installati
 mkdir -p "$app_path/Contents/Resources/Licenses"
 cp LICENSE "$app_path/Contents/Resources/Licenses/ByteKibble.txt"
 cp LICENSES/MIT-legacy.txt "$app_path/Contents/Resources/Licenses/MIT-legacy.txt"
+cp .build-audit/artifacts/sparkle/Sparkle/LICENSE "$app_path/Contents/Resources/Licenses/Sparkle.txt"
 
 version=$(<VERSION)
 prior_build=0
@@ -56,6 +60,13 @@ done
 /usr/libexec/PlistBuddy -c 'Add :CFBundleIconName string ByteKibble' "$plist"
 if [ "$mode" = release ]; then
   /usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUFeedURL string https://raw.githubusercontent.com/mustundead/ByteKibble/main/docs/updates/preview.xml' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUPublicEDKey string FFo6GQ0easmXdjP3wlXJCN9l/cD7jBHPT3SwXLA1yuY=' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUEnableAutomaticChecks bool true' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUAutomaticallyUpdate bool false' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUAllowsAutomaticUpdates bool false' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUSendProfileInfo bool false' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUVerifyUpdateBeforeExtraction bool true' "$plist"
 fi
 codesign --force --sign - "$app_path/Contents/Resources/ByteKibble_ByteKibble.bundle"
 codesign --force --sign - "$app_path"

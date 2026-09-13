@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuController: MenuPopoverController?
     func applicationDidFinishLaunching(_ notification: Notification) {
 #if !BYTEKIBBLE_ACCEPTANCE
+        AppUpdater.shared.start()
         // An accessory app has no visible app menu, but standard edit commands
         // still need a responder-chain menu for text-field keyboard shortcuts.
         let mainMenu = NSMenu()

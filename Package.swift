@@ -5,9 +5,11 @@ let package = Package(
     name: "ByteKibble",
     defaultLocalization: "zh-Hans",
     platforms: [.macOS(.v13)],
+    dependencies: [.package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.9.6")],
     targets: [
         .executableTarget(
             name: "ByteKibble",
+            dependencies: [.product(name: "Sparkle", package: "Sparkle")],
             path: "Sources/ByteKibble",
             resources: [
                 .copy("Resources/QuotaBag.png"),

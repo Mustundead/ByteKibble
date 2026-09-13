@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>ByteKibble Preview Updates</title>
+    <link>https://github.com/mustundead/ByteKibble/releases</link>
+    <description>MU Labs — ByteKibble preview releases</description>
+    <language>zh-CN</language>
+  </channel>
+</rss>

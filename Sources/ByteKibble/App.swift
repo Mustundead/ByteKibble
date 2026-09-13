@@ -6,7 +6,9 @@ import AppKit
 @main
 struct ByteKibbleAcceptanceApp: App {
     var body: some Scene {
-        WindowGroup("ByteKibble · Acceptance") { AcceptanceHarness() }
+        WindowGroup("ByteKibble · Acceptance") {
+            AcceptanceHarness().onAppear { AppUpdater.shared.start() }
+        }
             .windowResizability(.contentSize)
     }
 }
@@ -807,10 +809,7 @@ struct MenuView: View {
 
             HStack {
                 Spacer()
-                Text(AppInfo.versionLine)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .onTapGesture { AppInfo.openRepo() }
+                UpdateMenu()
                 Spacer()
             }
             .padding(.top, 2)

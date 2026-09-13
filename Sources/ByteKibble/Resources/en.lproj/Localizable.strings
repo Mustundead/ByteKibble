@@ -94,3 +94,6 @@
 "清除手动日期" = "Clear Manual Date";
 "保存" = "Save";
 "仅在本机为当前订阅设置倒计时，不修改服务商的流量或重置规则。日期过后请重新设置，不会自动顺延。" = "Set a local countdown for this subscription. This does not change your provider’s quota or reset schedule. Set a new date after it passes; it does not repeat automatically.";
+"检查更新…" = "Check for Updates…";
+"自动检查更新" = "Automatically Check for Updates";
+"软件更新" = "Software Updates";

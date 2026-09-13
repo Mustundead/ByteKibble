@@ -9,7 +9,9 @@
 
 ByteKibble is a native macOS menu bar utility for subscription traffic allowances. For users of Clash-family clients and SNTP, it answers one simple question: **how much data is left on this subscription?** Check usage, expiry and data sources without repeatedly opening a client or provider website.
 
-> **1.2.0 (46) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46). Images in `preview/` are historical.
+> **1.2.0 (47) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). Images in `preview/` are historical.
+
+**In-app updates (build 47 onward):** Click the version footer to check for updates or disable automatic checks. Installation requires confirmation. Build 46 and earlier need one manual upgrade first. Checks contact GitHub without sending subscription links or quota data; previews use a separate feed.
 
 <img src="docs/assets/quota-build46-full-dark.png" width="360" alt="Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)">
 
@@ -64,7 +66,7 @@ ByteKibble does not measure all network activity itself. Readings depend on the 
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Download the DMG or ZIP from the [1.2.0 (46) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+Download the DMG or ZIP from the [1.2.0 (47) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
 
 This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
 

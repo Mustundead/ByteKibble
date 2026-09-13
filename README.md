@@ -9,7 +9,9 @@
 
 字节猫粮是一款原生 macOS 菜单栏订阅流量工具，为 Clash 系客户端和守候网络（SNTP）用户提供一个简单的答案：**这份订阅还剩多少流量？** 不必反复打开客户端或服务商网站，点开菜单栏即可查看用量、到期信息与数据来源。
 
-> **1.2.0（46）测试版**：提供应用源码、首次使用欢迎页和 Apple silicon（arm64）安装包。已使用 Developer ID 签名，**尚未 Apple 公证**。[下载与完整更新说明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46)。`preview/` 中的旧截图为历史资料。
+> **1.2.0（47）测试版**：提供应用源码、首次使用欢迎页和 Apple silicon（arm64）安装包。已使用 Developer ID 签名，**尚未 Apple 公证**。[下载与完整更新说明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 中的旧截图为历史资料。
+
+**应用内更新（build 47 起）**：点击底部版本号可检查更新或关闭自动检查，安装需用户确认。build 46 及更早版本须先手动安装一次新版。更新检查联系 GitHub，不发送订阅链接或流量数据；测试版使用独立更新源。
 
 <img src="docs/assets/quota-build46-full-dark.png" width="360" alt="原生菜单弹窗实拍 · 剩余流量 100%（示例数据，非真实订阅）">
 
@@ -64,7 +66,7 @@
 
 需要 **macOS 13 或更高版本**。原生 Liquid Glass 样式需要 macOS 26 或更高版本；旧系统使用兼容样式。安装包支持的处理器架构、签名和公证状态以对应发布说明为准。
 
-从 [1.2.0（46）发布页](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46) 下载 DMG 或 ZIP。先退出正在运行的旧版；DMG 打开后将 ByteKibble 拖到 Applications，ZIP 则解压后将应用移入“应用程序”。从“应用程序”启动，不要一直运行磁盘映像内的副本。首次使用会显示欢迎页。
+从 [1.2.0（47）发布页](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47) 下载 DMG 或 ZIP。先退出正在运行的旧版；DMG 打开后将 ByteKibble 拖到 Applications，ZIP 则解压后将应用移入“应用程序”。从“应用程序”启动，不要一直运行磁盘映像内的副本。首次使用会显示欢迎页。
 
 本次二进制仅提供 **Apple silicon（arm64）**，不包含 Intel 版本。本地构建、测试及界面检查在 macOS 27 上完成；最低部署目标为 macOS 13，不代表所有旧系统均已实机验证。
 

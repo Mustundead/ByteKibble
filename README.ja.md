@@ -9,7 +9,9 @@
 
 ByteKibble は、macOS のメニューバーでサブスクリプションの通信量を確認できるネイティブアプリです。Clash 系クライアントや SNTP の利用者が知りたい、**「この契約であとどれだけ使える？」** に答えます。クライアントや提供元のサイトを何度も開かずに、使用量、有効期限、データの取得元を確認できます。
 
-> **1.2.0（46）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46)。`preview/` 内の画像は過去のバージョンです。
+> **1.2.0（47）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 内の画像は過去のバージョンです。
+
+**アプリ内更新（build 47 以降）：** 下部のバージョン番号から更新の確認や自動確認の無効化ができます。インストールには確認が必要です。build 46 以前は一度手動で更新してください。更新確認は GitHub に接続しますが、サブスクリプション URL や通信量は送信しません。プレビュー版は専用の更新フィードを使用します。
 
 <img src="docs/assets/quota-build46-full-dark.png" width="360" alt="ネイティブメニューの実行画面 · 残り通信量 100%（サンプルデータ、実際の契約ではありません）">
 
@@ -64,7 +66,7 @@ ByteKibble は**プロキシクライアント、VPN、速度測定ツール、�
 
 **macOS 13 以降**が必要です。ネイティブの Liquid Glass 表示は macOS 26 以降で利用し、古い OS では互換スタイルを使用します。対応するプロセッサ、署名、公証の状態は各パッケージのリリースノートをご確認ください。
 
- [1.2.0（46）の公開ページ](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46)から DMG または ZIP を入手してください。旧版を終了し、DMG 内の ByteKibble を Applications へドラッグするか、ZIP を展開してアプリを「アプリケーション」へ移動します。ディスク内のコピーではなく「アプリケーション」から起動してください。初回使用時にウェルカム画面を表示します。
+ [1.2.0（47）の公開ページ](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)から DMG または ZIP を入手してください。旧版を終了し、DMG 内の ByteKibble を Applications へドラッグするか、ZIP を展開してアプリを「アプリケーション」へ移動します。ディスク内のコピーではなく「アプリケーション」から起動してください。初回使用時にウェルカム画面を表示します。
 
 配布バイナリは **Apple silicon（arm64）専用**で、Intel 版は含まれません。ローカルビルド、テスト、画面確認は macOS 27 で実施しました。最小デプロイ対象は macOS 13 ですが、すべての旧 OS での実機確認を意味しません。
 

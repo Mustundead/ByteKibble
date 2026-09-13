@@ -9,7 +9,9 @@
 
 ByteKibble은 macOS 메뉴 막대에서 구독 데이터 사용량을 확인하는 네이티브 앱입니다. Clash 계열 클라이언트와 SNTP 사용자가 궁금해하는 **“이 구독으로 데이터를 얼마나 더 쓸 수 있을까?”**에 답합니다. 클라이언트나 제공업체 웹사이트를 매번 열지 않고 사용량, 만료일, 데이터 출처를 확인할 수 있습니다.
 
-> **1.2.0 (46) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46). `preview/`의 이미지는 과거 버전입니다.
+> **1.2.0 (47) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). `preview/`의 이미지는 과거 버전입니다.
+
+**앱 내 업데이트(build 47부터):** 하단 버전 번호에서 업데이트를 확인하거나 자동 확인을 끌 수 있습니다. 설치에는 사용자 확인이 필요합니다. build 46 이하는 먼저 한 번 수동으로 업데이트해야 합니다. 업데이트 확인은 GitHub에 연결하지만 구독 링크나 사용량은 전송하지 않습니다. 미리 보기 버전은 별도 업데이트 피드를 사용합니다.
 
 <img src="docs/assets/quota-build46-full-dark.png" width="360" alt="네이티브 메뉴 실행 화면 · 잔여 데이터 100% (예시 데이터, 실제 구독 아님)">
 
@@ -64,7 +66,7 @@ ByteKibble이 모든 네트워크 트래픽을 직접 측정하는 것은 아닙
 
 **macOS 13 이상**이 필요합니다. 네이티브 Liquid Glass 스타일은 macOS 26 이상에서 사용하며 이전 시스템에서는 호환 스타일을 사용합니다. 프로세서 지원, 서명, 공증 여부는 각 패키지의 릴리스 설명을 확인하세요.
 
-[1.2.0 (46) 릴리스 페이지](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46)에서 DMG 또는 ZIP을 받으세요. 이전 버전을 종료한 뒤 DMG의 ByteKibble을 Applications로 드래그하거나 ZIP을 풀어 앱을 “응용 프로그램”으로 옮기세요. 디스크 안의 복사본이 아닌 “응용 프로그램”에서 실행하세요. 처음 사용할 때 환영 화면이 표시됩니다.
+[1.2.0 (47) 릴리스 페이지](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)에서 DMG 또는 ZIP을 받으세요. 이전 버전을 종료한 뒤 DMG의 ByteKibble을 Applications로 드래그하거나 ZIP을 풀어 앱을 “응용 프로그램”으로 옮기세요. 디스크 안의 복사본이 아닌 “응용 프로그램”에서 실행하세요. 처음 사용할 때 환영 화면이 표시됩니다.
 
 배포 바이너리는 **Apple silicon (arm64) 전용**이며 Intel 버전은 포함하지 않습니다. 로컬 빌드, 테스트 및 화면 확인은 macOS 27에서 수행했습니다. 최소 배포 대상은 macOS 13이지만 모든 이전 OS에서 실기기 검증을 완료했다는 의미는 아닙니다.
 
