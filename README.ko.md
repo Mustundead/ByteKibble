@@ -7,7 +7,7 @@
 <p align="center">구독 데이터 잔여량을 한눈에.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · 한국어 · <a href="README.ja.md">日本語</a></p>
 
-ByteKibble은 macOS 메뉴 막대에서 구독 데이터 사용량을 확인하는 네이티브 앱입니다. Clash 계열 클라이언트와 SNTP 사용자가 궁금해하는 **“이 구독으로 데이터를 얼마나 더 쓸 수 있을까?”**에 답합니다. 클라이언트나 제공업체 웹사이트를 매번 열지 않고 사용량, 만료일, 데이터 출처를 확인할 수 있습니다.
+ByteKibble은 **잔여 데이터, 사용량, 구독 만료일 및 초기화 알림**을 확인하는 macOS 메뉴 막대 앱입니다. 지원되는 Clash 계열 클라이언트와 SNTP의 구독을 자동으로 찾고, Quantumult / Quantumult X와 Surge에서 사용하는 HTTPS 구독 링크를 직접 추가할 수 있으며 Shadowsocks SIP008 사용량 필드를 읽습니다. 표시되는 정보는 제공업체가 반환하는 데이터에 따라 달라집니다. 자세한 조건은 아래 호환 범위를 확인하세요.
 
 > **1.2.0 (47) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). `preview/`의 이미지는 과거 버전입니다.
 
@@ -40,7 +40,7 @@ ByteKibble은 **프록시 클라이언트, VPN, 속도 측정 도구 또는 앱�
 
 ## 데이터 출처
 
-**build 46 지원 범위:** Quantumult / Quantumult X, Surge의 HTTPS 구독은 제공업체가 `Subscription-Userinfo`를 반환하면 조회할 수 있습니다. Surge의 `#!MANAGED-CONFIG https://…` 첫 줄도 붙여 넣을 수 있습니다. Shadowsocks SIP008의 `bytes_used`와 `bytes_remaining`을 지원하며, 업로드/다운로드 구분이 없으면 미제공으로 표시합니다. 자동 감지가 아닌 직접 추가 방식입니다. 단일 `ss://` 링크는 지원하지 않으며 모든 클라이언트·제공업체 연동 검증을 완료한 것은 아닙니다.
+**현재 호환 범위:** Quantumult / Quantumult X, Surge의 HTTPS 구독은 제공업체가 `Subscription-Userinfo`를 반환하면 조회할 수 있습니다. Surge의 `#!MANAGED-CONFIG https://…` 첫 줄도 붙여 넣을 수 있습니다. Shadowsocks SIP008의 `bytes_used`와 `bytes_remaining`을 지원하며, 업로드/다운로드 구분이 없으면 미제공으로 표시합니다. 자동 감지가 아닌 직접 추가 방식입니다. 단일 `ss://` 링크는 지원하지 않으며 모든 클라이언트·제공업체 연동 검증을 완료한 것은 아닙니다.
 
 | 출처 | 자동으로 읽는 정보 | 참고 |
 | --- | --- | --- |

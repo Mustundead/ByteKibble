@@ -7,7 +7,7 @@
 <p align="center">Your subscription allowance, at a glance.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · English · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
-ByteKibble is a native macOS menu bar utility for subscription traffic allowances. For users of Clash-family clients and SNTP, it answers one simple question: **how much data is left on this subscription?** Check usage, expiry and data sources without repeatedly opening a client or provider website.
+ByteKibble is a native macOS menu bar app for **remaining and used data, subscription expiry, and reset reminders**. It can discover subscriptions from supported Clash-family clients and SNTP, accept manual HTTPS subscription links used with Quantumult / Quantumult X and Surge, and parse Shadowsocks SIP008 quota fields. Available readings depend on the provider's data; see the compatibility conditions below.
 
 > **1.2.0 (47) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47). Images in `preview/` are historical.
 
@@ -40,7 +40,7 @@ The menu bar pie represents **remaining** data. The horizontal bar in the detail
 
 ## Supported sources
 
-**Build 46 support:** HTTPS subscription links used with Quantumult / Quantumult X and Surge work when the provider returns `Subscription-Userinfo`. You can also paste a Surge `#!MANAGED-CONFIG https://…` first line. Shadowsocks SIP008 supports `bytes_used` and `bytes_remaining`; missing directional counters show “— · Not provided”. These clients require manual entry, not automatic discovery. A single `ss://` node is not a quota endpoint. Full client/provider integration coverage is not claimed.
+**Current compatibility:** HTTPS subscription links used with Quantumult / Quantumult X and Surge work when the provider returns `Subscription-Userinfo`. You can also paste a Surge `#!MANAGED-CONFIG https://…` first line. Shadowsocks SIP008 supports `bytes_used` and `bytes_remaining`; missing directional counters show “— · Not provided”. These clients require manual entry, not automatic discovery. A single `ss://` node is not a quota endpoint. Full client/provider integration coverage is not claimed.
 
 | Source | Read automatically | Notes |
 | --- | --- | --- |

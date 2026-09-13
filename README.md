@@ -7,7 +7,7 @@
 <p align="center">订阅流量，抬眼就见。</p>
 <p align="center">简体中文 · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
-字节猫粮是一款原生 macOS 菜单栏订阅流量工具，为 Clash 系客户端和守候网络（SNTP）用户提供一个简单的答案：**这份订阅还剩多少流量？** 不必反复打开客户端或服务商网站，点开菜单栏即可查看用量、到期信息与数据来源。
+字节猫粮是一款原生 macOS 菜单栏订阅流量工具，用来查看**剩余流量、已用流量、套餐到期信息和重置提醒**。它可自动发现受支持的 Clash 系客户端及守候网络（SNTP）订阅，也可手动添加 Quantumult／Quantumult X、Surge 使用的 HTTPS 订阅链接，并解析 Shadowsocks SIP008 流量字段。能显示哪些信息取决于服务商返回的数据，具体条件见下方兼容性说明。
 
 > **1.2.0（47）测试版**：提供应用源码、首次使用欢迎页和 Apple silicon（arm64）安装包。已使用 Developer ID 签名，**尚未 Apple 公证**。[下载与完整更新说明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 中的旧截图为历史资料。
 
@@ -40,7 +40,7 @@
 
 ## 订阅从哪里来
 
-**build 46 支持**：Quantumult／Quantumult X、Surge 使用的 HTTPS 订阅链接，只要服务商返回 `Subscription-Userinfo` 流量头即可查询；Surge 还可粘贴 `#!MANAGED-CONFIG https://…` 首行。Shadowsocks SIP008 支持 `bytes_used` 和 `bytes_remaining`，未提供上传／下载拆分时显示“— · 未提供”。这些客户端仍需手动添加，未新增自动发现；单个 `ss://` 节点不是流量查询链接。未声明完成所有客户端／服务商联测。
+**当前版本兼容范围**：Quantumult／Quantumult X、Surge 使用的 HTTPS 订阅链接，只要服务商返回 `Subscription-Userinfo` 流量头即可查询；Surge 还可粘贴 `#!MANAGED-CONFIG https://…` 首行。Shadowsocks SIP008 支持 `bytes_used` 和 `bytes_remaining`，未提供上传／下载拆分时显示“— · 未提供”。这些客户端仍需手动添加，未新增自动发现；单个 `ss://` 节点不是流量查询链接。未声明完成所有客户端／服务商联测。
 
 | 来源 | 自动读取内容 | 说明 |
 | --- | --- | --- |

@@ -7,7 +7,7 @@
 <p align="center">サブスクリプションの残り通信量を、ひと目で。</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · 日本語</p>
 
-ByteKibble は、macOS のメニューバーでサブスクリプションの通信量を確認できるネイティブアプリです。Clash 系クライアントや SNTP の利用者が知りたい、**「この契約であとどれだけ使える？」** に答えます。クライアントや提供元のサイトを何度も開かずに、使用量、有効期限、データの取得元を確認できます。
+ByteKibble は、**残り通信量、使用量、契約の有効期限、リセットの予定**を確認できる macOS メニューバーアプリです。対応する Clash 系クライアントと SNTP の契約を自動検出し、Quantumult／Quantumult X、Surge で使う HTTPS サブスクリプション URL の手動追加と、Shadowsocks SIP008 の通信量フィールドに対応します。取得できる情報は提供元のデータによって異なります。詳しい条件は以下の対応範囲をご覧ください。
 
 > **1.2.0（47）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47)。`preview/` 内の画像は過去のバージョンです。
 
@@ -40,7 +40,7 @@ ByteKibble は**プロキシクライアント、VPN、速度測定ツール、�
 
 ## データの取得元
 
-**build 46 の対応範囲：** Quantumult／Quantumult X、Surge で使う HTTPS サブスクリプションは、提供元が `Subscription-Userinfo` を返す場合に取得できます。Surge の `#!MANAGED-CONFIG https://…` の先頭行も貼り付け可能です。Shadowsocks SIP008 は `bytes_used` と `bytes_remaining` に対応し、送受信の内訳がない場合は未提供と表示します。自動検出ではなく手動追加です。単体の `ss://` リンクは対象外で、すべてのクライアント・提供元との連携検証は完了していません。
+**現在の対応範囲：** Quantumult／Quantumult X、Surge で使う HTTPS サブスクリプションは、提供元が `Subscription-Userinfo` を返す場合に取得できます。Surge の `#!MANAGED-CONFIG https://…` の先頭行も貼り付け可能です。Shadowsocks SIP008 は `bytes_used` と `bytes_remaining` に対応し、送受信の内訳がない場合は未提供と表示します。自動検出ではなく手動追加です。単体の `ss://` リンクは対象外で、すべてのクライアント・提供元との連携検証は完了していません。
 
 | 取得元 | 自動で読み取る情報 | 補足 |
 | --- | --- | --- |
