@@ -10,6 +10,7 @@ enum Fetcher {
     struct Failure: Error {
         let message: String
         var priority: Int = 1
+        var retryable: Bool = false
     }
 
     /// 0 = 直连；本机 HTTP 代理：守候网络、ClashX、Verge、Surge。
@@ -24,14 +25,14 @@ enum Fetcher {
     }
     private static let transportMemory = TransportMemory()
 
-    private final class SecureRedirects: NSObject, URLSessionTaskDelegate {
-        func urlSession(_ session: URLSession, task: URLSessionTask,
-                        willPerformHTTPRedirection response: HTTPURLResponse,
-                        newRequest request: URLRequest,
-                        completionHandler: @escaping (URLRequest?) -> Void) {
-            completionHandler(request.url?.scheme?.lowercased() == "https" ? request : nil)
-        }
+    static func redirectAllowed(from: URL?, to: URL?) -> Bool {
+        guard let from, let to, Providers.validatedURL(to.absoluteString) != nil else { return false }
+        return from.scheme?.lowercased() == "https"
+            && from.host?.lowercased() == to.host?.lowercased()
+            && (from.port ?? 443) == (to.port ?? 443)
     }
+
+    static let maximumBodyBytes = 2 * 1024 * 1024
 
     static func fetch(url: String) async throws -> QuotaSample {
         guard let parsed = Providers.validatedURL(url), let host = parsed.host else {
@@ -39,24 +40,35 @@ enum Fetcher {
         }
         let goodPort = await transportMemory.port(for: host)
         let order: [Int] = goodPort.map { g in [g] + transports.filter { $0 != g } } ?? transports
+        return try await fetch(url: url, order: order, perform: { try await attempt(url: $0, port: $1) })
+    }
+
+    static func fetch(url: String, order: [Int],
+                      perform: (String, Int) async throws -> QuotaSample) async throws -> QuotaSample {
         var last = Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
         for port in order {
+            try Task.checkCancellation()
             do {
-                let sample = try await attempt(url: url, port: port)
-                await transportMemory.remember(port, for: host)
+                let sample = try await perform(url, port)
+                try Task.checkCancellation()
+                if let host = URL(string: url)?.host { await transportMemory.remember(port, for: host) }
                 return sample
             } catch {
+                if error is CancellationError || (error as? URLError)?.code == .cancelled { throw CancellationError() }
+                try Task.checkCancellation()
                 // Never include a raw URLSession error: it can contain a subscription token.
                 let failure = (error as? Failure) ?? Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
+                guard failure.retryable else { throw failure }
                 if failure.priority >= last.priority { last = failure }
             }
         }
         throw last
     }
 
-    static func attempt(url: String, port: Int) async throws -> QuotaSample {
+    static func attempt(url: String, port: Int, protocolClasses: [AnyClass]? = nil) async throws -> QuotaSample {
         guard let u = Providers.validatedURL(url) else { throw Failure(message: L10n.t("请输入有效的 HTTPS 订阅链接。")) }
         let cfg = URLSessionConfiguration.ephemeral
+        cfg.protocolClasses = protocolClasses
         cfg.timeoutIntervalForRequest = 6
         cfg.timeoutIntervalForResource = 10
         cfg.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -67,28 +79,27 @@ enum Fetcher {
                 "HTTPSEnable": 1, "HTTPSProxy": "127.0.0.1", "HTTPSPort": port,
             ]
         }
-        let session = URLSession(configuration: cfg, delegate: SecureRedirects(), delegateQueue: nil)
-        defer { session.finishTasksAndInvalidate() }
-
         var req = URLRequest(url: u)
         req.setValue("clash-verge/1.7.7", forHTTPHeaderField: "User-Agent")
-        // GET：部分面板对 HEAD 不返回 userinfo 头；配置体通常只有几百 KB
-        let resp: URLResponse
-        let data: Data
-        do { (data, resp) = try await session.data(for: req) }
+        // GET is required by some providers. Stop immediately when quota headers exist.
+        do {
+            return try await QuotaRequest().run(req, configuration: cfg)
+        }
         catch let error as URLError {
             switch error.code {
+            case .cancelled: throw CancellationError()
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot,
                  .serverCertificateNotYetValid, .secureConnectionFailed:
                 throw Failure(message: L10n.t("无法验证订阅服务器的安全连接。请联系服务商检查证书。"), priority: 2)
             default:
-                throw Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
+                let retryable: Set<URLError.Code> = [.timedOut, .cannotFindHost, .cannotConnectToHost, .networkConnectionLost, .dnsLookupFailed, .notConnectedToInternet, .cannotLoadFromNetwork]
+                throw Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"), retryable: retryable.contains(error.code))
             }
         }
-        guard let http = resp as? HTTPURLResponse else { throw Failure(message: L10n.t("订阅服务器返回了无效响应。")) }
-        guard (200..<300).contains(http.statusCode) else { throw Failure(message: L10n.f("订阅服务器返回 HTTP %@。请检查链接或联系服务商。", String(http.statusCode)), priority: 3) }
+    }
 
-        return try parseResponse(header: http.value(forHTTPHeaderField: "Subscription-Userinfo"), data: data)
+    static func oversizedResponse() -> Failure {
+        Failure(message: L10n.t("订阅响应超过 2 MiB 限制。请联系服务商提供流量响应头。"), priority: 3)
     }
 
     /// An explicit header remains authoritative, including malformed headers.
@@ -99,6 +110,7 @@ enum Fetcher {
     }
 
     static func parseSIP008(data: Data) throws -> QuotaSample {
+        guard data.count <= maximumBodyBytes else { throw oversizedResponse() }
         struct Subscription: Decodable {
             let version: Int
             // Only quota fields are read. Node credentials are not decoded or retained.

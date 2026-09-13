@@ -97,3 +97,8 @@
 "检查更新…" = "Check for Updates…";
 "自动检查更新" = "Automatically Check for Updates";
 "软件更新" = "Software Updates";
+"订阅响应超过 2 MiB 限制。请联系服务商提供流量响应头。" = "The subscription response exceeds 2 MiB. Ask your provider for quota response headers.";
+"无法访问钥匙串。原有订阅记录已保留，请解锁钥匙串后重试。" = "Keychain is unavailable. Existing subscription records are preserved. Unlock Keychain and try again.";
+"未能安全保存订阅。请解锁钥匙串后重试。" = "Couldn’t securely save the subscription. Unlock Keychain and try again.";
+"未能移除订阅。记录已保留，请解锁钥匙串后重试。" = "Couldn’t remove the subscription. Its record is preserved. Unlock Keychain and try again.";
+"订阅重定向已被阻止。请添加服务商提供的最终 HTTPS 地址。" = "Subscription redirect blocked. Add the final HTTPS URL supplied by your provider.";

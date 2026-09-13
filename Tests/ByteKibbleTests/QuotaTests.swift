@@ -177,9 +177,10 @@ final class ViewModelTests: XCTestCase {
         let name = "ByteKibbleTests.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
+        let store = InMemoryCredentialStore()
         let live = sample(10)
         let vm = ViewModel(defaults: defaults,
-                           scan: { Providers.custom(defaults: defaults) },
+                           scan: { Providers.custom(defaults: defaults, store: store) }, credentialStore: store,
                            automaticRefresh: false, fetch: { _ in live })
         XCTAssertTrue(vm.addCustom(url: "https://a.example/sub"))
         XCTAssertTrue(vm.addCustom(url: "https://b.example/sub"))
@@ -212,10 +213,11 @@ final class ViewModelTests: XCTestCase {
         let name = "ByteKibbleTests.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }
-        Providers.addCustom(url: "https://a.example/sub", defaults: defaults)
+        let store = InMemoryCredentialStore()
+        Providers.addCustom(url: "https://a.example/sub", defaults: defaults, store: store)
         let started = expectation(description: "request started")
         var pending: CheckedContinuation<QuotaSample, Error>?
-        let vm = ViewModel(defaults: defaults, scan: { Providers.custom(defaults: defaults) },
+        let vm = ViewModel(defaults: defaults, scan: { Providers.custom(defaults: defaults, store: store) }, credentialStore: store,
                            automaticRefresh: false, fetch: { _ in
             try await withCheckedThrowingContinuation { continuation in
                 pending = continuation

@@ -33,12 +33,21 @@ The feed compares monotonically increasing CFBundleVersion, not just 1.2.0.
    configuration; `prepare-update-acceptance.sh` creates an isolated localhost
    test pair. Its localhost HTTP exception never enters production packages.
 
-Build 47 is published and the preview feed points to its signed application ZIP.
-All four GitHub asset digests match local files. The public application ZIP was
-downloaded again and its SHA-256 and EdDSA signature verified before publishing
-the feed. This is distribution verification, not a completed production OTA install.
+## Current distribution and source status
 
-## Local acceptance — 2026-09-13
+Build 49 is the published prerelease and the preview feed points to its signed
+application ZIP. Its release contains the DMG, installer ZIP, application ZIP
+and SHA256SUMS.txt. It is Developer ID signed, not Apple notarized.
+
+Current source has a local build 50 candidate with Keychain migration, a 2 MiB
+response-body limit, retry/backoff/cancellation improvements and same-origin
+HTTPS redirects. 55 automated tests and 11 real-Keychain checks inside the
+signed candidate passed using isolated dummy subscriptions. **Build 50 has not
+been uploaded or offered through the feed.** Do not change the feed to 50 until
+its exact signed archive is published and verified. See the
+[security verification record](../security-hardening.md).
+
+## Historical local OTA acceptance — build 47, 2026-09-13
 
 - 36 tests passed, including build-number comparison and no updater startup in tests.
 - Five localization tables parse successfully; Chinese and English native menu

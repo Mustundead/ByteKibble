@@ -10,7 +10,7 @@ final class ViewModel: ObservableObject {
     @Published var selectedID: String {
         didSet {
             guard !isPreview, oldValue != selectedID else { return }
-            defaults.set(selectedID, forKey: "selectedTargetID")
+            defaults.set(selectedID.isEmpty ? "" : Providers.persistenceID(selectedID), forKey: "selectedTargetID")
             if automaticRefresh { Task { await refreshLive() } }
         }
     }
@@ -19,11 +19,16 @@ final class ViewModel: ObservableObject {
     @Published var now = Date()
     @Published private(set) var removedTarget: SubTarget?
     @Published private(set) var notice: String?
+    @Published private var storageFailure: String?
     private var timer: AnyCancellable?
     private var tickCount = 0
     private var requestIDs: [String: UUID] = [:]
+    private var requests: [String: Task<QuotaSample, Error>] = [:]
+    private var retryCounts: [String: Int] = [:]
+    private var nextAutomaticRefresh: [String: Date] = [:]
     private let defaults: UserDefaults
-    private let scan: () -> [SubTarget]
+    private let scan: (() -> [SubTarget])?
+    private let credentialStore: CredentialStore
     private let fetch: (String) async throws -> QuotaSample
     private let automaticRefresh: Bool
     @Published private var manualResetDates: [String: Double] = [:]
@@ -31,17 +36,25 @@ final class ViewModel: ObservableObject {
     private static let resetDatesKey = "manualResetDates"
 
     init(preview: Bool = false, defaults: UserDefaults = .standard,
-         scan: @escaping () -> [SubTarget] = { Providers.scanAll() },
+         scan: (() -> [SubTarget])? = nil,
+         credentialStore: CredentialStore = Providers.productionCredentialStore,
          automaticRefresh: Bool = true,
          fetch: @escaping (String) async throws -> QuotaSample = Fetcher.fetch) {
         self.isPreview = preview
         self.defaults = defaults
         self.scan = scan
+        self.credentialStore = credentialStore
         self.fetch = fetch
         self.automaticRefresh = automaticRefresh
         manualResetDates = defaults.dictionary(forKey: Self.resetDatesKey) as? [String: Double] ?? [:]
         selectedID = preview ? "" : defaults.string(forKey: "selectedTargetID") ?? ""
         guard !preview else { return }
+        manualResetDates = Dictionary(manualResetDates.map { (Providers.persistenceID($0.key), $0.value) }, uniquingKeysWith: { first, _ in first })
+        defaults.set(manualResetDates, forKey: Self.resetDatesKey)
+        if !selectedID.isEmpty {
+            selectedID = Providers.persistenceID(selectedID)
+            defaults.set(selectedID, forKey: "selectedTargetID")
+        }
         rescan()
         guard automaticRefresh else { return }
         Task { await refreshLive() }
@@ -52,14 +65,14 @@ final class ViewModel: ObservableObject {
                 self.tickCount += 1
                 if self.tickCount % 60 == 0 { self.rescan() }
                 if self.tickCount % 30 == 0 || (self.statusLine != nil && self.tickCount % 2 == 0) {
-                    Task { await self.refreshLive() }
+                    Task { await self.refreshLive(automatic: true) }
                 }
             }
     }
 
     var selected: SubTarget? { targets.first { $0.id == selectedID } ?? targets.first }
     var fetching: Bool { selected.map { loading.contains($0.id) } ?? false }
-    var statusLine: String? { selected.flatMap { failures[$0.id] } }
+    var statusLine: String? { storageFailure ?? selected.flatMap { failures[$0.id] } }
 
     func sample(for target: SubTarget) -> QuotaSample? {
         // Reading a cache again does not make it a newer measurement.
@@ -84,7 +97,7 @@ final class ViewModel: ObservableObject {
 
     var manualResetDate: Date? {
         guard let target = selected,
-              let timestamp = manualResetDates[Providers.dedupeKey(target.url)],
+              let timestamp = manualResetDates[Providers.persistenceID(Providers.dedupeKey(target.url))],
               timestamp.isFinite, timestamp > 0,
               timestamp < Date.distantFuture.timeIntervalSince1970 else { return nil }
         return Date(timeIntervalSince1970: timestamp)
@@ -105,7 +118,7 @@ final class ViewModel: ObservableObject {
     /// Local, explicit override only. Never changes quota samples or provider configuration.
     func setManualResetDate(_ date: Date?) {
         guard !isPreview, let target = selected else { return }
-        let key = Providers.dedupeKey(target.url)
+        let key = Providers.persistenceID(Providers.dedupeKey(target.url))
         if let date {
             guard date.timeIntervalSince1970.isFinite,
                   date < Date.distantFuture,
@@ -145,34 +158,64 @@ final class ViewModel: ObservableObject {
         guard !isPreview else { return }
         now = Date()
         rescan()
-        Task { await refreshLive() }
+        Task { await refreshLive(automatic: true) }
     }
     func rescan() {
         guard !isPreview else { return }
-        targets = scan()
-        if !targets.contains(where: { $0.id == selectedID }) {
+        var storageFailed = false
+        let discovered = scan?() ?? Providers.scanAll(defaults: defaults, store: credentialStore, onStorageFailure: { storageFailed = true })
+        targets = discovered
+        if storageFailed {
+            storageFailure = L10n.t("无法访问钥匙串。原有订阅记录已保留，请解锁钥匙串后重试。")
+        } else { storageFailure = nil }
+        for id in Array(requests.keys) where !targets.contains(where: { $0.id == id }) {
+            requests.removeValue(forKey: id)?.cancel()
+            requestIDs[id] = nil
+            loading.remove(id)
+        }
+        if let restored = targets.first(where: { Providers.persistenceID($0.id) == selectedID || Providers.persistenceID($0.url) == selectedID }) {
+            selectedID = restored.id
+        } else if !storageFailed, !targets.contains(where: { $0.id == selectedID }) {
             selectedID = targets.first?.id ?? ""
         }
     }
-    func refreshLive() async {
+    func refreshLive(automatic: Bool = false) async {
         guard let t = selected, !loading.contains(t.id) else { return }
+        if automatic, let next = nextAutomaticRefresh[t.id], Date() < next { return }
         let requestID = UUID()
         requestIDs[t.id] = requestID
         loading.insert(t.id)
         failures[t.id] = nil
         defer {
-            if requestIDs[t.id] == requestID { loading.remove(t.id) }
+            if requestIDs[t.id] == requestID {
+                loading.remove(t.id)
+                requests[t.id] = nil
+                requestIDs[t.id] = nil
+            }
         }
+        let operation = Task { try await fetch(t.url) }
+        requests[t.id] = operation
         do {
-            var sample = try await fetch(t.url)
+            var sample = try await withTaskCancellationHandler {
+                try await operation.value
+            } onCancel: { operation.cancel() }
+            try Task.checkCancellation()
+            guard !operation.isCancelled else { return }
             guard requestIDs[t.id] == requestID, targets.contains(where: { $0.id == t.id }) else { return }
             sample.planName = sample.planName ?? t.cached?.planName
             sample.resetDay = sample.resetDay ?? t.cached?.resetDay
             samples[t.id] = sample
             now = Date()
+            retryCounts[t.id] = nil
+            nextAutomaticRefresh[t.id] = now.addingTimeInterval(60)
         } catch {
+            if error is CancellationError || operation.isCancelled || Task.isCancelled { return }
             guard requestIDs[t.id] == requestID, targets.contains(where: { $0.id == t.id }) else { return }
             failures[t.id] = (error as? Fetcher.Failure)?.message ?? L10n.t("无法连接。请检查网络和代理客户端后重试。")
+            let count = min((retryCounts[t.id] ?? 0) + 1, 5)
+            retryCounts[t.id] = count
+            let delay = (error as? Fetcher.Failure)?.retryable == true ? min(900, 60 * pow(2, Double(count - 1))) : 900
+            nextAutomaticRefresh[t.id] = Date().addingTimeInterval(delay)
         }
     }
     @discardableResult
@@ -186,7 +229,10 @@ final class ViewModel: ObservableObject {
             return true
         }
         notice = nil
-        Providers.addCustom(url: text, defaults: defaults)
+        guard Providers.addCustom(url: text, defaults: defaults, store: credentialStore) else {
+            storageFailure = L10n.t("未能安全保存订阅。请解锁钥匙串后重试。")
+            return false
+        }
         rescan()
         selectedID = targets.first(where: { $0.url == text })?.id ?? selectedID
         if automaticRefresh { Task { await refreshLive() } }
@@ -195,24 +241,30 @@ final class ViewModel: ObservableObject {
     func removeCustom(id: String) {
         guard !isPreview else { return }
         guard let target = targets.first(where: { $0.id == id && $0.origin == "custom" }) else { return }
+        guard Providers.removeCustom(url: target.url, defaults: defaults, store: credentialStore) else {
+            storageFailure = L10n.t("未能移除订阅。记录已保留，请解锁钥匙串后重试。")
+            return
+        }
         removedTarget = target
-        let resetKey = Providers.dedupeKey(target.url)
+        let resetKey = Providers.persistenceID(Providers.dedupeKey(target.url))
         removedResetDate = manualResetDates[resetKey].map(Date.init(timeIntervalSince1970:))
         manualResetDates.removeValue(forKey: resetKey)
         defaults.set(manualResetDates, forKey: Self.resetDatesKey)
         requestIDs[id] = nil
+        requests.removeValue(forKey: id)?.cancel()
+        retryCounts[id] = nil
+        nextAutomaticRefresh[id] = nil
         loading.remove(id)
         failures[id] = nil
         notice = nil
-        Providers.removeCustom(url: target.url, defaults: defaults)
         rescan()
     }
     func undoRemoval() {
         guard let target = removedTarget else { return }
+        guard addCustom(url: target.url) else { return }
         removedTarget = nil
-        _ = addCustom(url: target.url)
         if let date = removedResetDate {
-            manualResetDates[Providers.dedupeKey(target.url)] = date.timeIntervalSince1970
+            manualResetDates[Providers.persistenceID(Providers.dedupeKey(target.url))] = date.timeIntervalSince1970
             defaults.set(manualResetDates, forKey: Self.resetDatesKey)
         }
         removedResetDate = nil

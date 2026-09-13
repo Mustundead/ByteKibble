@@ -21,6 +21,9 @@ struct ByteKibbleEntry {
 @MainActor
 struct ByteKibbleApp {
     static func main() {
+        if CommandLine.arguments.contains("--verify-credential-store") {
+            exit(CredentialAcceptance.run() ? 0 : 1)
+        }
         if let out = Self.previewOutputDir {
             Self.renderPreviews(to: out)
             return

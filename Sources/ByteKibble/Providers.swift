@@ -6,8 +6,8 @@ import Foundation
 /// - ClashX / ClashX Meta：defaults 里的 kRemoteConfigs（JSON 数组）
 /// - 手动添加：用户粘贴的任意机场订阅链接
 enum Providers {
-    static func scanAll(defaults: UserDefaults = .standard) -> [SubTarget] {
-        let list = sntp() + verge() + clashX() + custom(defaults: defaults)
+    static func scanAll(defaults: UserDefaults = .standard, store: CredentialStore = productionCredentialStore, onStorageFailure: (() -> Void)? = nil) -> [SubTarget] {
+        let list = sntp() + verge() + clashX() + custom(defaults: defaults, store: store, onStorageFailure: onStorageFailure)
         var out: [SubTarget] = []
         for t in list {
             let key = dedupeKey(t.url)
@@ -111,28 +111,59 @@ enum Providers {
 
     private static let customKey = "customTargets"
 
-    static func custom(defaults: UserDefaults = .standard) -> [SubTarget] {
+    static func custom(defaults: UserDefaults = .standard, store: CredentialStore = productionCredentialStore, onStorageFailure: (() -> Void)? = nil) -> [SubTarget] {
+        let migrated = migrateLegacy(defaults: defaults, store: store)
+        if !migrated { onStorageFailure?() }
         guard let arr = defaults.array(forKey: customKey) as? [[String: String]] else { return [] }
-        return arr.compactMap { d in
-            guard let url = d["url"], url.hasPrefix("http") else { return nil }
-            return SubTarget(id: url, name: d["name"] ?? host(url), origin: "custom", url: url, cached: nil)
+        var missing = false
+        let result = arr.compactMap { d -> SubTarget? in
+            if let url = d["url"], validatedURL(url) != nil {
+                return SubTarget(id: url, name: d["name"] ?? host(url), origin: "custom", url: url, cached: nil)
+            }
+            guard let id = d["id"] else { return nil }
+            guard let url = store.read(for: id), validatedURL(url) != nil else { missing = true; return nil }
+            return SubTarget(id: id, name: d["name"] ?? host(url), origin: "custom", url: url, cached: nil)
         }
+        if missing { onStorageFailure?() }
+        return result
     }
 
-    static func addCustom(url: String, defaults: UserDefaults = .standard) {
-        guard validatedURL(url) != nil else { return }
+    @discardableResult static func addCustom(url: String, defaults: UserDefaults = .standard, store: CredentialStore = productionCredentialStore) -> Bool {
+        guard validatedURL(url) != nil else { return false }
+        guard migrateLegacy(defaults: defaults, store: store) else { return false }
         let ud = defaults
         var arr = (ud.array(forKey: customKey) as? [[String: String]]) ?? []
-        guard !arr.contains(where: { $0["url"] == url }) else { return }
-        arr.append(["url": url, "name": host(url)])
+        let id = "subscription." + secureIdentifier(url)
+        guard store.write(url, for: id) else { return false }
+        guard !arr.contains(where: { $0["id"] == id }) else { return true }
+        arr.append(["id": id, "name": host(url)])
         ud.set(arr, forKey: customKey)
+        return true
     }
 
-    static func removeCustom(url: String, defaults: UserDefaults = .standard) {
+    @discardableResult static func removeCustom(url: String, defaults: UserDefaults = .standard, store: CredentialStore = productionCredentialStore) -> Bool {
         let ud = defaults
         var arr = (ud.array(forKey: customKey) as? [[String: String]]) ?? []
-        arr.removeAll { $0["url"] == url }
+        let id = "subscription." + secureIdentifier(url)
+        guard store.remove(for: id) else { return false }
+        arr.removeAll { $0["id"] == id || $0["url"] == url }
         ud.set(arr, forKey: customKey)
+        return true
+    }
+
+    @discardableResult private static func migrateLegacy(defaults: UserDefaults, store: CredentialStore) -> Bool {
+        guard let old = defaults.array(forKey: customKey) as? [[String: String]], old.contains(where: { $0["url"] != nil }) else { return true }
+        var migrated: [[String: String]] = []
+        for item in old {
+            if item["url"] == nil, let id = item["id"] { migrated.append(["id": id, "name": item["name"] ?? L10n.t("订阅")]); continue }
+            guard let url = item["url"] else { return false }
+            let id = "subscription." + secureIdentifier(url)
+            if let existing = store.read(for: id), existing != url { return false }
+            guard store.write(url, for: id) else { return false }
+            migrated.append(["id": id, "name": item["name"] ?? host(url)])
+        }
+        defaults.set(migrated, forKey: customKey)
+        return true
     }
 
     // MARK: - 工具

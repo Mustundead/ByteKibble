@@ -3,12 +3,14 @@ import XCTest
 
 @MainActor
 final class ManualResetTests: XCTestCase {
+    private var store = InMemoryCredentialStore()
     private func fixture(_ body: (UserDefaults, ViewModel, SubTarget) throws -> Void) throws {
         let domain = "ByteKibbleTests.reset.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: domain))
         defer { defaults.removePersistentDomain(forName: domain) }
-        Providers.addCustom(url: "https://example.com/sub", defaults: defaults)
-        let vm = ViewModel(defaults: defaults, scan: { Providers.custom(defaults: defaults) }, automaticRefresh: false)
+        store = InMemoryCredentialStore()
+        Providers.addCustom(url: "https://example.com/sub", defaults: defaults, store: store)
+        let vm = ViewModel(defaults: defaults, scan: { [self] in Providers.custom(defaults: defaults, store: self.store) }, credentialStore: store, automaticRefresh: false)
         let target = try XCTUnwrap(vm.selected)
         vm.now = Date(timeIntervalSince1970: 1_800_000_000)
         vm.samples[target.id] = QuotaSample(uploaded: 10, downloaded: 20, total: 100, resetDay: 4, fetchedAt: vm.now, source: .live)
@@ -23,7 +25,7 @@ final class ManualResetTests: XCTestCase {
             XCTAssertEqual(vm.manualResetDate, Calendar.current.startOfDay(for: date))
             XCTAssertTrue(vm.menubarDaysText?.hasSuffix("*") == true)
             XCTAssertEqual(vm.samples[target.id], original)
-            let reopened = ViewModel(defaults: defaults, scan: { Providers.custom(defaults: defaults) }, automaticRefresh: false)
+            let reopened = ViewModel(defaults: defaults, scan: { [self] in Providers.custom(defaults: defaults, store: self.store) }, credentialStore: store, automaticRefresh: false)
             XCTAssertEqual(reopened.manualResetDate, vm.manualResetDate)
         }
     }
@@ -72,7 +74,7 @@ final class ManualResetTests: XCTestCase {
             XCTAssertNil(vm.manualResetDate)
             vm.selectedID = target.id
             vm.removeCustom(id: target.id)
-            XCTAssertNil((defaults.dictionary(forKey: "manualResetDates") ?? [:])[Providers.dedupeKey(target.url)])
+            XCTAssertNil((defaults.dictionary(forKey: "manualResetDates") ?? [:])[Providers.persistenceID(Providers.dedupeKey(target.url))])
             vm.undoRemoval()
             XCTAssertEqual(vm.manualResetDate, date)
         }

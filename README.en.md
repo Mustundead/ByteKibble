@@ -94,9 +94,11 @@ Import a subscription into a supported client or add an HTTPS link in ByteKibble
 
 **Local parsing does not mean offline operation.** Refreshing quota requests your subscription endpoint and may follow its HTTPS redirects; the provider receives the URL/token needed for that request. A local proxy may carry it through its configured route. Update checks and downloads contact GitHub and its download services, without passing subscription URLs, tokens or quota readings to the updater. Disabling automatic update checks does not disable quota refresh.
 
-Subscription requests retain system TLS certificate validation and reject HTTPS-to-HTTP redirects. User-facing errors omit raw network errors that may contain tokens. Manual links are stored in local preferences, **not encrypted Keychain storage**; this does not protect them against a compromised Mac or exposed local data/backups.
+The current source (not yet released in an installer) stores manual links in the local Keychain. Preferences retain names and hashed identifiers; selection and manual reset-date keys no longer contain raw links. Legacy records migrate only after successful Keychain write/read verification. On failure, old records are preserved with a warning, not described as encrypted. Historical backups and other clients’ configurations are untouched; this cannot guarantee safety on a compromised Mac. Published build 49 still stores manual links in preferences.
 
-Automatic discovery reads local client settings. Manually added links are stored in ByteKibble's local preferences. Adding, removing or undoing an entry changes only ByteKibble's list; **it does not modify or cancel the provider subscription**.
+The current source retains system TLS validation and allows redirects only within the same HTTPS host and port; add the final URL manually for cross-origin links. Quota headers stop body downloads early; SIP008 bodies without quota headers are capped at 2 MiB. Only transient connection failures try other local proxy routes; HTTP, certificate and parsing errors do not. Automatic failures back off; manual refresh remains available immediately. User-facing errors omit raw network errors that may contain tokens.
+
+Automatic discovery reads local client settings. Adding, removing or undoing an entry changes only ByteKibble's list and manual-link storage; **it does not modify or cancel the provider subscription**.
 
 A subscription URL can contain an access token: treat it like a password. Queries contact the corresponding provider. When using a local proxy, the request follows that proxy's configured route. ByteKibble has no traffic relay server of its own and does not send subscription links to an analytics platform.
 
@@ -123,3 +125,4 @@ Report problems in [Issues](https://github.com/mustundead/ByteKibble/issues) wit
 Made by [MU Labs](https://mustundead.com). See [LICENSE](LICENSE) for code reuse, attribution and commercial authorization requirements.
 
 **Existing permissions are preserved.** Code and versions previously provided under MIT, including the 1.2.0 (41) acceptance package, retain the [legacy MIT terms](LICENSES/MIT-legacy.txt), including commercial-use rights. See [LICENSE](LICENSE) for the scope of the terms covering newly distributed material.
+> **Current source / local build 50 (unreleased)**: Keychain migration, a 2 MiB body limit, retry/cancellation improvements and same-origin HTTPS redirect validation are implemented. 55 automated tests and 11 real-Keychain checks inside the signed candidate passed using isolated dummy subscriptions. **The downloadable release remains build 49, not notarized by Apple.** [Verification scope and remaining limitations](docs/security-hardening.md).
