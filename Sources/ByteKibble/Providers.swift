@@ -158,6 +158,17 @@ enum Providers {
         return url
     }
 
+    /// Accept the copied first line of a Surge managed profile, not its scripts or rules.
+    static func subscriptionURL(from input: String) -> String? {
+        let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        if validatedURL(text) != nil { return text }
+        guard !text.contains("\n"), !text.contains("\r") else { return nil }
+        let parts = text.split(whereSeparator: { $0.isWhitespace })
+        guard parts.count >= 2, parts[0] == "#!MANAGED-CONFIG" else { return nil }
+        let url = String(parts[1])
+        return validatedURL(url) == nil ? nil : url
+    }
+
     private static func i64(_ any: Any?) -> Int64 {
         (any as? NSNumber)?.int64Value ?? Int64(any as? String ?? "0") ?? 0
     }

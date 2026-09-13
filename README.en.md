@@ -9,9 +9,9 @@
 
 ByteKibble is a native macOS menu bar utility for subscription traffic allowances. For users of Clash-family clients and SNTP, it answers one simple question: **how much data is left on this subscription?** Check usage, expiry and data sources without repeatedly opening a client or provider website.
 
-> **1.2.0 (45) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). Images in `preview/` are historical.
+> **1.2.0 (46) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46). Images in `preview/` are historical.
 
-<img src="docs/assets/quota-build45-full-dark.png" width="360" alt="Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)">
+<img src="docs/assets/quota-build46-full-dark.png" width="360" alt="Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)">
 
 Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)
 
@@ -38,6 +38,8 @@ The menu bar pie represents **remaining** data. The horizontal bar in the detail
 
 ## Supported sources
 
+**Build 46 support:** HTTPS subscription links used with Quantumult / Quantumult X and Surge work when the provider returns `Subscription-Userinfo`. You can also paste a Surge `#!MANAGED-CONFIG https://…` first line. Shadowsocks SIP008 supports `bytes_used` and `bytes_remaining`; missing directional counters show “— · Not provided”. These clients require manual entry, not automatic discovery. A single `ss://` node is not a quota endpoint. Full client/provider integration coverage is not claimed.
+
 | Source | Read automatically | Notes |
 | --- | --- | --- |
 | Clash Verge / Clash Verge Rev | Subscription links in local `profiles.yaml` files | Usage is requested from the provider |
@@ -45,22 +47,24 @@ The menu bar pie represents **remaining** data. The horizontal bar in the detail
 | SNTP | Subscription link, plan and traffic cache, client-reported reset days | The cache may lack a trustworthy original update time |
 | Manual entry | An HTTPS subscription link you paste | The provider must supply parseable usage information |
 
-Live readings come from the subscription response's `subscription-userinfo` header. **Using the Mihomo core does not automatically make a client discoverable**: detection supports the storage formats listed above. For other clients, try adding the link manually.
+Live readings come from the subscription response's `subscription-userinfo` header, or SIP008 JSON quota fields when that header is absent. **Using the Mihomo core does not automatically make a client discoverable**: detection supports the storage formats listed above. For other clients, try adding the link manually.
 
 ByteKibble does not measure all network activity itself. Readings depend on the provider or client. Missing headers, incomplete fields, a zero total or a failed query must not be interpreted as a measured zero remaining balance. Check the source and update time when using an older reading.
 
 ### Reset dates and refreshes
 
+- Click the Resets tile to set the next reset date when it is unavailable. This local override is labeled Manual and `*`; clearing it restores subscription metadata. Past dates show Date passed. Dates do not repeat automatically and never clear provider usage.
+
 - Reset days are client-reported, not a standard field in the usual subscription header. The countdown and **estimated** date are derived from those days, not a confirmed provider reset time. Older cache data can affect accuracy.
 - No reset date is guessed when the data is unavailable. Subscription expiry and allowance reset are different events.
 - The running app refreshes periodically and offers manual refresh. Sleep, connectivity and provider responses can delay updates.
-- Queries try a direct connection and common local proxy ports (`7899`, `7890`, `7897`). ByteKibble does not start a proxy client or change system proxy settings.
+- Queries try a direct connection and common local proxy ports (`7899`, `7890`, `7897`, `6152`). ByteKibble does not start a proxy client or change system proxy settings.
 
 ## Requirements and installation
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Download the DMG or ZIP from the [1.2.0 (45) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+Download the DMG or ZIP from the [1.2.0 (46) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build46). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
 
 This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
 

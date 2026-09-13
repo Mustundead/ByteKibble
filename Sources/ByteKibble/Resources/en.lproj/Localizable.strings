@@ -14,7 +14,7 @@
 "%@后" = "in %@";
 "%@ 天后" = "in %@ days";
 "添加订阅" = "Add Subscription";
-"粘贴任意机场订阅链接，兼容 Clash 客户端" = "Paste any subscription link — works with Clash clients";
+"粘贴提供流量信息的 HTTPS 订阅链接" = "Paste an HTTPS subscription link with usage information";
 "未找到订阅数据" = "No subscription found";
 "自动检测 Clash Verge / ClashX Meta / 守候网络 客户端，或在下方粘贴任意机场订阅链接。" = "Auto-detects Clash Verge / ClashX Meta / SNTP, or paste any subscription link below.";
 "实时查询失败，当前显示缓存数据" = "Live update failed — showing cached data";
@@ -85,3 +85,12 @@
 "点击屏幕顶部的菜单栏图标，打开流量面板。" = "Click the menu bar icon at the top of your screen to open the traffic panel.";
 "开始使用" = "Get Started";
 "使用介绍" = "Introduction";
+"日期已过" = "Date passed";
+"手动设置" = "Manually set";
+"手动 · %@" = "Manual · %@";
+"设置日期" = "Set date";
+"设置重置日期" = "Set Reset Date";
+"下次重置" = "Next reset";
+"清除手动日期" = "Clear Manual Date";
+"保存" = "Save";
+"仅在本机为当前订阅设置倒计时，不修改服务商的流量或重置规则。日期过后请重新设置，不会自动顺延。" = "Set a local countdown for this subscription. This does not change your provider’s quota or reset schedule. Set a new date after it passes; it does not repeat automatically.";

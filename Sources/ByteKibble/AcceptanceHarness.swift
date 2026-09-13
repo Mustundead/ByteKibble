@@ -43,6 +43,12 @@ struct AcceptanceHarness: View {
             if host.contains("missing") {
                 throw Fetcher.Failure(message: L10n.t("订阅流量信息不完整，无法计算剩余量。"))
             }
+            if host.contains("sip008") {
+                return try Fetcher.parseSIP008(data: Data("{\"version\":1,\"servers\":[],\"bytes_used\":26843545600,\"bytes_remaining\":80530636800}".utf8))
+            }
+            if host.contains("quantumult") {
+                return try Fetcher.parse(header: "upload=2375927198; download=12983696043; total=1099511627776; expire=1862111613")
+            }
             return Self.sample(download: host.contains("warning") ? 80 : host.contains("critical") ? 90 : host.contains("exhausted") ? 110 : 32,
                                expired: host.contains("expired"))
         }
@@ -63,6 +69,28 @@ struct AcceptanceHarness: View {
     init() {
         let source = FixtureSource()
         self.source = source
+        if CommandLine.arguments.contains("--compat-screenshot") {
+            let quantumult = CommandLine.arguments.contains("--quantumult")
+            let target = SubTarget(id: "compat-example", name: quantumult ? "Quantumult" : "Shadowsocks SIP008",
+                                   origin: "custom", url: quantumult ? "https://quantumult.example/sub" : "https://sip008.example/sub", cached: nil)
+            source.clients = [target]
+            let vm = ViewModel(defaults: source.defaults, scan: { source.clients },
+                               automaticRefresh: false, fetch: { try await source.fetch($0) })
+            vm.targets = [target]
+            vm.selectedID = target.id
+            if CommandLine.arguments.contains("--manual-reset") {
+                vm.setManualResetDate(Calendar.current.date(byAdding: .day, value: 7, to: Date())!)
+            }
+            vm.samples[target.id] = quantumult
+                ? try! Fetcher.parse(header: "upload=2375927198; download=12983696043; total=1099511627776; expire=1862111613")
+                : try! Fetcher.parseSIP008(data: Data("{\"version\":1,\"servers\":[],\"bytes_used\":26843545600,\"bytes_remaining\":80530636800}".utf8))
+            _vm = StateObject(wrappedValue: vm)
+            _dark = State(initialValue: !CommandLine.arguments.contains("--light"))
+            let language = CommandLine.arguments.contains("--zh") ? "zh-Hans" : "en"
+            _language = State(initialValue: language)
+            L10n.setAcceptanceLanguage(language)
+            return
+        }
         if CommandLine.arguments.contains("--readme-screenshot") {
             let vm = ViewModel(preview: true, defaults: source.defaults)
             let target = SubTarget(id: "readme-example", name: "Premium", origin: "sntp",
@@ -87,7 +115,7 @@ struct AcceptanceHarness: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("QA · Synthetic data · Isolated preferences").font(.caption)
                 Picker("Scenario", selection: $scene) {
-                    ForEach(["Normal", "Warning", "Critical", "Exhausted", "Expired", "Multiple", "Long name", "Empty", "Loading", "First failure", "Cache failure", "Missing"], id: \.self) {
+                    ForEach(["Normal", "Quantumult", "SIP008", "Warning", "Critical", "Exhausted", "Expired", "Multiple", "Long name", "Empty", "Loading", "First failure", "Cache failure", "Missing"], id: \.self) {
                         Text($0).tag($0)
                     }
                 }
@@ -126,7 +154,7 @@ struct AcceptanceHarness: View {
             if menuPreview == nil {
                 menuPreview = MenuPopoverController(vm: vm, allowsSystemChanges: false)
                 menuPreview?.setPreviewAppearance(dark: dark)
-                if CommandLine.arguments.contains("--readme-screenshot") {
+                if CommandLine.arguments.contains("--readme-screenshot") || CommandLine.arguments.contains("--compat-screenshot") {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         menuPreview?.showScreenshotPreview()
                     }

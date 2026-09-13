@@ -1,6 +1,7 @@
 import Foundation
 
-/// 通过订阅链接的 `subscription-userinfo` 响应头实时查询流量（Clash 通用做法）。
+/// 通过订阅链接的 `subscription-userinfo` 响应头查询流量（Clash / Quantumult）；
+/// 没有响应头时读取 Shadowsocks SIP008 的合计用量字段。
 /// 三个要点：
 /// 1. 订阅域名直连经常不通，依次尝试直连和常见本地代理混合端口；
 /// 2. 保留系统 TLS 证书验证，并拒绝降级到 HTTP 的重定向；
@@ -11,8 +12,8 @@ enum Fetcher {
         var priority: Int = 1
     }
 
-    /// 0 = 直连；其余为各家客户端默认混合端口（守候网络 7899、ClashX 7890、Verge 7897）
-    private static let transports: [Int] = [0, 7899, 7890, 7897]
+    /// 0 = 直连；本机 HTTP 代理：守候网络、ClashX、Verge、Surge。
+    static let transports: [Int] = [0, 7899, 7890, 7897, 6152]
     private actor TransportMemory {
         private var ports: [String: Int] = [:]
         func port(for host: String) -> Int? { ports[host] }
@@ -73,7 +74,8 @@ enum Fetcher {
         req.setValue("clash-verge/1.7.7", forHTTPHeaderField: "User-Agent")
         // GET：部分面板对 HEAD 不返回 userinfo 头；配置体通常只有几百 KB
         let resp: URLResponse
-        do { (_, resp) = try await session.data(for: req) }
+        let data: Data
+        do { (data, resp) = try await session.data(for: req) }
         catch let error as URLError {
             switch error.code {
             case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot,
@@ -86,10 +88,36 @@ enum Fetcher {
         guard let http = resp as? HTTPURLResponse else { throw Failure(message: L10n.t("订阅服务器返回了无效响应。")) }
         guard (200..<300).contains(http.statusCode) else { throw Failure(message: L10n.f("订阅服务器返回 HTTP %@。请检查链接或联系服务商。", String(http.statusCode)), priority: 3) }
 
-        guard let header = http.value(forHTTPHeaderField: "Subscription-Userinfo") else {
+        return try parseResponse(header: http.value(forHTTPHeaderField: "Subscription-Userinfo"), data: data)
+    }
+
+    /// An explicit header remains authoritative, including malformed headers.
+    /// Never execute subscription contents or store node credentials.
+    static func parseResponse(header: String?, data: Data) throws -> QuotaSample {
+        if let header { return try parse(header: header) }
+        return try parseSIP008(data: data)
+    }
+
+    static func parseSIP008(data: Data) throws -> QuotaSample {
+        struct Subscription: Decodable {
+            let version: Int
+            // Only quota fields are read. Node credentials are not decoded or retained.
+            let servers: [Server]
+            let bytes_used: Int64
+            let bytes_remaining: Int64
+            struct Server: Decodable { let id: String }
+        }
+        guard let subscription = try? JSONDecoder().decode(Subscription.self, from: data),
+              subscription.version == 1,
+              subscription.bytes_used >= 0, subscription.bytes_remaining >= 0 else {
             throw Failure(message: L10n.t("订阅未提供流量信息。请联系服务商确认支持情况。"), priority: 3)
         }
-        return try parse(header: header)
+        let total = subscription.bytes_used.addingReportingOverflow(subscription.bytes_remaining)
+        guard !total.overflow, total.partialValue > 0 else {
+            throw Failure(message: L10n.t("订阅流量信息不完整，无法计算剩余量。"), priority: 3)
+        }
+        return QuotaSample(uploaded: nil, downloaded: nil, total: total.partialValue,
+                           fetchedAt: Date(), source: .live, aggregateUsed: subscription.bytes_used)
     }
 
     static func parse(header: String) throws -> QuotaSample {

@@ -10,8 +10,8 @@ struct QuotaSample: Equatable {
         var displayName: String { L10n.t(rawValue) }
     }
 
-    var uploaded: Int64
-    var downloaded: Int64
+    var uploaded: Int64?
+    var downloaded: Int64?
     var total: Int64
     var expireAt: Date?
     var resetDay: Int?
@@ -19,8 +19,12 @@ struct QuotaSample: Equatable {
     /// nil means the client did not supply a trustworthy update time.
     var fetchedAt: Date?
     var source: Source
+    /// SIP008 reports aggregate usage, never an upload/download breakdown.
+    var aggregateUsed: Int64? = nil
 
     var used: Int64 {
+        if let aggregateUsed { return aggregateUsed }
+        guard let uploaded, let downloaded else { return 0 }
         let sum = uploaded.addingReportingOverflow(downloaded)
         return sum.overflow ? Int64.max : sum.partialValue
     }

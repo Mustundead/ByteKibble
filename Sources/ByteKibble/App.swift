@@ -445,6 +445,8 @@ struct MenuView: View {
     var loginErrorOverride: String?
     @State private var customURL = ""
     @State private var showAdd = false
+    @State private var showResetEditor = false
+    @State private var resetDraft = Date()
     @State private var loginStatus = SMAppService.Status.notRegistered
     @State private var loginError: String?
     @FocusState private var urlFocused: Bool
@@ -461,6 +463,8 @@ struct MenuView: View {
             .padding(16)
             .frame(width: 380)
             .panelSolidBackground(nativePopover: nativePopover)
+            .sheet(isPresented: $showResetEditor) { resetEditor }
+            .onChange(of: vm.selectedID) { _ in showResetEditor = false }
             .onAppear {
                 if !nativePopover { vm.menuOpened() }
                 if !vm.isPreview && allowsSystemChanges {
@@ -518,11 +522,11 @@ struct MenuView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if let rd = s.resetDay {
+            if let countdown = vm.resetCountdown {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 12, weight: .regular))
-                    Text(vm.countdownText(days: rd, now: vm.now))
+                    Text(countdown + (vm.manualResetDate != nil ? "*" : ""))
                         .font(.callout.weight(.bold))
                         .monospacedDigit()
                         .lineLimit(1)
@@ -625,14 +629,24 @@ struct MenuView: View {
     private func tileGrid(_ s: QuotaSample) -> some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
                   spacing: 10) {
-            tile(icon: "arrow.up", label: L10n.uploadTile, value: Fmt.bytes(s.uploaded))
-            tile(icon: "arrow.down", label: L10n.downloadTile, value: Fmt.bytes(s.downloaded))
-            tile(icon: "arrow.clockwise",
+            tile(icon: "arrow.up", label: L10n.uploadTile, value: s.uploaded.map(Fmt.bytes) ?? "—",
+                 sub: s.uploaded == nil ? L10n.t("未提供") : nil)
+            tile(icon: "arrow.down", label: L10n.downloadTile, value: s.downloaded.map(Fmt.bytes) ?? "—",
+                 sub: s.downloaded == nil ? L10n.t("未提供") : nil)
+            Button {
+                resetDraft = max(vm.manualResetDate ?? vm.now, Calendar.current.startOfDay(for: vm.now))
+                showResetEditor = true
+            } label: {
+                tile(icon: "arrow.clockwise",
                  label: L10n.resetTile,
-                 value: s.resetDay.map { vm.countdownText(days: $0, now: vm.now) } ?? "—",
-                 sub: s.resetDay.flatMap { Fmt.nextReset(days: $0, from: vm.now) }.map {
+                 value: vm.resetCountdown ?? "—",
+                 sub: vm.manualResetDate.map { L10n.f("手动 · %@", Fmt.shortDate($0)) }
+                    ?? s.resetDay.flatMap { Fmt.nextReset(days: $0, from: vm.now) }.map {
                      String(format: L10n.t("预计 %@"), Fmt.shortDate($0))
-                 })
+                 } ?? L10n.t("设置日期"))
+            }
+            .buttonStyle(.plain)
+            .help(L10n.t("设置重置日期"))
             tile(icon: "calendar",
                  label: L10n.expireTile,
                  value: s.expireAt.map { Fmt.date($0) } ?? "—",
@@ -670,6 +684,34 @@ struct MenuView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .glassCard(in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var resetEditor: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(L10n.t("设置重置日期")).font(.headline)
+            Text(L10n.t("仅在本机为当前订阅设置倒计时，不修改服务商的流量或重置规则。日期过后请重新设置，不会自动顺延。"))
+                .font(.callout).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            DatePicker(L10n.t("下次重置"), selection: $resetDraft,
+                       in: Calendar.current.startOfDay(for: vm.now)..., displayedComponents: .date)
+                .datePickerStyle(.field)
+            if vm.manualResetDate != nil {
+                Button(L10n.t("清除手动日期")) {
+                    vm.setManualResetDate(nil)
+                    showResetEditor = false
+                }
+            }
+            HStack {
+                Spacer()
+                Button(L10n.t("取消")) { showResetEditor = false }.keyboardShortcut(.cancelAction)
+                Button(L10n.t("保存")) {
+                    vm.setManualResetDate(resetDraft)
+                    showResetEditor = false
+                }.keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(20)
+        .frame(width: 340)
     }
 
     // MARK: 空状态
@@ -823,7 +865,7 @@ struct MenuView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.accentColor)
                         .font(.callout.weight(.semibold))
-                        .disabled(Providers.validatedURL(customURL.trimmingCharacters(in: .whitespacesAndNewlines)) == nil)
+                        .disabled(Providers.subscriptionURL(from: customURL) == nil)
                 }
                 .padding(.top, 10)
             }

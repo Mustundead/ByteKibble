@@ -26,6 +26,9 @@ final class ViewModel: ObservableObject {
     private let scan: () -> [SubTarget]
     private let fetch: (String) async throws -> QuotaSample
     private let automaticRefresh: Bool
+    @Published private var manualResetDates: [String: Double] = [:]
+    private var removedResetDate: Date?
+    private static let resetDatesKey = "manualResetDates"
 
     init(preview: Bool = false, defaults: UserDefaults = .standard,
          scan: @escaping () -> [SubTarget] = { Providers.scanAll() },
@@ -36,6 +39,7 @@ final class ViewModel: ObservableObject {
         self.scan = scan
         self.fetch = fetch
         self.automaticRefresh = automaticRefresh
+        manualResetDates = defaults.dictionary(forKey: Self.resetDatesKey) as? [String: Double] ?? [:]
         selectedID = preview ? "" : defaults.string(forKey: "selectedTargetID") ?? ""
         guard !preview else { return }
         rescan()
@@ -73,8 +77,42 @@ final class ViewModel: ObservableObject {
     }
     // Client-reported reset days; display follows the original midnight convention.
     var menubarDaysText: String? {
+        if manualResetDate != nil { return resetCountdown.map { "\($0)*" } }
         guard let target = selected, let sample = sample(for: target), let days = sample.resetDay else { return nil }
         return countdownText(days: days, now: now)
+    }
+
+    var manualResetDate: Date? {
+        guard let target = selected,
+              let timestamp = manualResetDates[Providers.dedupeKey(target.url)],
+              timestamp.isFinite, timestamp > 0,
+              timestamp < Date.distantFuture.timeIntervalSince1970 else { return nil }
+        return Date(timeIntervalSince1970: timestamp)
+    }
+
+    var resetCountdown: String? {
+        if let date = manualResetDate {
+            let calendar = Calendar.current
+            let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: now),
+                                              to: calendar.startOfDay(for: date)).day ?? 0
+            if days < 0 { return L10n.t("日期已过") }
+            if days == 0 { return L10n.today }
+            return countdownText(days: days, now: now)
+        }
+        return selected.flatMap { sample(for: $0)?.resetDay }.map { countdownText(days: $0, now: now) }
+    }
+
+    /// Local, explicit override only. Never changes quota samples or provider configuration.
+    func setManualResetDate(_ date: Date?) {
+        guard !isPreview, let target = selected else { return }
+        let key = Providers.dedupeKey(target.url)
+        if let date {
+            guard date.timeIntervalSince1970.isFinite,
+                  date < Date.distantFuture,
+                  Calendar.current.startOfDay(for: date) >= Calendar.current.startOfDay(for: now) else { return }
+            manualResetDates[key] = Calendar.current.startOfDay(for: date).timeIntervalSince1970
+        } else { manualResetDates.removeValue(forKey: key) }
+        defaults.set(manualResetDates, forKey: Self.resetDatesKey)
     }
 
     // Restored at the user's request: original client-day countdown presentation.
@@ -93,6 +131,7 @@ final class ViewModel: ObservableObject {
     var accessibilitySummary: String {
         guard let t = selected, let s = sample(for: t) else { return menubarValueText }
         return "\(t.name), \(L10n.remainingTraffic) \(Fmt.bytes(s.remaining)), \(freshness(s))"
+            + (manualResetDate != nil ? ", \(L10n.t("手动设置")), \(resetCountdown ?? "")" : "")
     }
     func freshness(_ sample: QuotaSample) -> String {
         guard let date = sample.fetchedAt else { return L10n.t("客户端缓存 · 更新时间未知") }
@@ -139,8 +178,7 @@ final class ViewModel: ObservableObject {
     @discardableResult
     func addCustom(url: String) -> Bool {
         guard !isPreview else { return false }
-        let text = url.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard Providers.validatedURL(text) != nil else { return false }
+        guard let text = Providers.subscriptionURL(from: url) else { return false }
         if let existing = targets.first(where: { Providers.dedupeKey($0.url) == Providers.dedupeKey(text) }) {
             selectedID = existing.id
             notice = L10n.t("已选择已有订阅。")
@@ -158,6 +196,10 @@ final class ViewModel: ObservableObject {
         guard !isPreview else { return }
         guard let target = targets.first(where: { $0.id == id && $0.origin == "custom" }) else { return }
         removedTarget = target
+        let resetKey = Providers.dedupeKey(target.url)
+        removedResetDate = manualResetDates[resetKey].map(Date.init(timeIntervalSince1970:))
+        manualResetDates.removeValue(forKey: resetKey)
+        defaults.set(manualResetDates, forKey: Self.resetDatesKey)
         requestIDs[id] = nil
         loading.remove(id)
         failures[id] = nil
@@ -169,5 +211,10 @@ final class ViewModel: ObservableObject {
         guard let target = removedTarget else { return }
         removedTarget = nil
         _ = addCustom(url: target.url)
+        if let date = removedResetDate {
+            manualResetDates[Providers.dedupeKey(target.url)] = date.timeIntervalSince1970
+            defaults.set(manualResetDates, forKey: Self.resetDatesKey)
+        }
+        removedResetDate = nil
     }
 }

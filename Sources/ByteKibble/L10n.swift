@@ -46,7 +46,7 @@ enum L10n {
     static var removeManualSub: String { t("删除当前手动订阅") }
     static var remainingTraffic: String { t("剩余流量") }
     static var addSubTitle: String { t("添加订阅") }
-    static var addSubSubtitle: String { t("粘贴任意机场订阅链接，兼容 Clash 客户端") }
+    static var addSubSubtitle: String { t("粘贴提供流量信息的 HTTPS 订阅链接") }
     static var resetTile: String { t("流量重置") }
     static var expireTile: String { t("套餐到期") }
     static var uploadTile: String { t("上行流量") }
