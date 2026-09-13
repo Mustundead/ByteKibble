@@ -1,4 +1,4 @@
-> **Build 49**: Stash, Clash, Surge, Hiddify, Loon and sing-box import-link parsing. [Compatibility and limitations](docs/client-compatibility.md). This does not add automatic discovery; quota availability depends on provider data.
+> **Build 50 released**: Keychain migration, a 2 MiB body limit, retry/cancellation improvements and same-origin HTTPS redirect validation. 55 automated tests and 11 real-Keychain checks inside the signed candidate passed using isolated dummy subscriptions. **Developer ID signed, not notarized by Apple.** [Verification scope and remaining limitations](docs/security-hardening.md).
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: a warm gold kibble bag with a paw mark">
@@ -11,7 +11,7 @@
 
 ByteKibble is a native macOS menu bar app for **remaining and used data, subscription expiry, and reset reminders**. It can discover subscriptions from supported Clash-family clients and SNTP, accept manual HTTPS subscription links used with Quantumult / Quantumult X and Surge, and parse Shadowsocks SIP008 quota fields. Available readings depend on the provider's data; see the compatibility conditions below.
 
-> **1.2.0 (49) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49). Images in `preview/` are historical.
+> **1.2.0 (50) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50). Images in `preview/` are historical.
 
 **In-app updates (build 47 onward):** Click the version footer to check for updates or disable automatic checks. Installation requires confirmation. Build 46 and earlier need one manual upgrade first. Checks contact GitHub without sending subscription links or quota data; previews use a separate feed.
 
@@ -76,7 +76,7 @@ ByteKibble does not measure all network activity itself. Readings depend on the 
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Download the DMG or ZIP from the [1.2.0 (49) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+Download the DMG or ZIP from the [1.2.0 (50) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
 
 This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
 
@@ -94,7 +94,7 @@ Import a subscription into a supported client or add an HTTPS link in ByteKibble
 
 **Local parsing does not mean offline operation.** Refreshing quota requests your subscription endpoint and may follow its HTTPS redirects; the provider receives the URL/token needed for that request. A local proxy may carry it through its configured route. Update checks and downloads contact GitHub and its download services, without passing subscription URLs, tokens or quota readings to the updater. Disabling automatic update checks does not disable quota refresh.
 
-The current source (not yet released in an installer) stores manual links in the local Keychain. Preferences retain names and hashed identifiers; selection and manual reset-date keys no longer contain raw links. Legacy records migrate only after successful Keychain write/read verification. On failure, old records are preserved with a warning, not described as encrypted. Historical backups and other clients’ configurations are untouched; this cannot guarantee safety on a compromised Mac. Published build 49 still stores manual links in preferences.
+Build 50 stores manual links in the local Keychain. Preferences retain names and hashed identifiers; selection and manual reset-date keys no longer contain raw links. Legacy records migrate only after successful Keychain write/read verification. On failure, old records are preserved with a warning, not described as encrypted. Historical backups and other clients’ configurations are untouched; this cannot guarantee safety on a compromised Mac.
 
 The current source retains system TLS validation and allows redirects only within the same HTTPS host and port; add the final URL manually for cross-origin links. Quota headers stop body downloads early; SIP008 bodies without quota headers are capped at 2 MiB. Only transient connection failures try other local proxy routes; HTTP, certificate and parsing errors do not. Automatic failures back off; manual refresh remains available immediately. User-facing errors omit raw network errors that may contain tokens.
 
@@ -125,4 +125,3 @@ Report problems in [Issues](https://github.com/mustundead/ByteKibble/issues) wit
 Made by [MU Labs](https://mustundead.com). See [LICENSE](LICENSE) for code reuse, attribution and commercial authorization requirements.
 
 **Existing permissions are preserved.** Code and versions previously provided under MIT, including the 1.2.0 (41) acceptance package, retain the [legacy MIT terms](LICENSES/MIT-legacy.txt), including commercial-use rights. See [LICENSE](LICENSE) for the scope of the terms covering newly distributed material.
-> **Current source / local build 50 (unreleased)**: Keychain migration, a 2 MiB body limit, retry/cancellation improvements and same-origin HTTPS redirect validation are implemented. 55 automated tests and 11 real-Keychain checks inside the signed candidate passed using isolated dummy subscriptions. **The downloadable release remains build 49, not notarized by Apple.** [Verification scope and remaining limitations](docs/security-hardening.md).

@@ -1,4 +1,4 @@
-# Security and request hardening — unreleased source
+# Security and request hardening — build 50
 
 Scope: the four findings from the 2026-09-13 audit. No provider configuration,
 real subscription credentials, installed application, GitHub release or update
@@ -86,7 +86,7 @@ an installed-version upgrade or full process restart.
 
 `codesign --verify --deep --strict` passed. Signature inspection confirmed
 Developer ID, timestamp and Hardened Runtime. This candidate is arm64 and
-has not been notarized, installed over the user's app or published as a release.
+has not been notarized or installed over the user's app during acceptance.
 
 Reproduce after signing a fresh candidate:
 
@@ -103,4 +103,4 @@ production Keychain service can be supplied to this acceptance command.
 - [Keychain synchronization](https://developer.apple.com/documentation/security/ksecattrsynchronizable): synchronization is not enabled; no iCloud credential sharing is introduced.
 - [URLSession async interfaces](https://developer.apple.com/videos/play/wwdc2021/10095/): investigated streaming and cancellation; adopted data-delegate chunk processing for explicit response/body handling rather than whole-response `Data` buffering.
 
-Build 49 remains the published version and does not include these changes.
+Build 50 publishes these changes. Build 49 and earlier do not include them.

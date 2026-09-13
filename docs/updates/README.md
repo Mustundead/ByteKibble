@@ -35,16 +35,16 @@ The feed compares monotonically increasing CFBundleVersion, not just 1.2.0.
 
 ## Current distribution and source status
 
-Build 49 is the published prerelease and the preview feed points to its signed
+Build 50 is the published prerelease and the preview feed points to its signed
 application ZIP. Its release contains the DMG, installer ZIP, application ZIP
 and SHA256SUMS.txt. It is Developer ID signed, not Apple notarized.
 
-Current source has a local build 50 candidate with Keychain migration, a 2 MiB
+Build 50 includes Keychain migration, a 2 MiB
 response-body limit, retry/backoff/cancellation improvements and same-origin
 HTTPS redirects. 55 automated tests and 11 real-Keychain checks inside the
-signed candidate passed using isolated dummy subscriptions. **Build 50 has not
-been uploaded or offered through the feed.** Do not change the feed to 50 until
-its exact signed archive is published and verified. See the
+signed candidate passed using isolated dummy subscriptions. The archive is
+published before the feed is advanced. This does not establish an actual
+GitHub-hosted OTA installation or Apple notarization. See the
 [security verification record](../security-hardening.md).
 
 ## Historical local OTA acceptance — build 47, 2026-09-13

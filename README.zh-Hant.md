@@ -1,4 +1,4 @@
-> **build 49**：新增 Stash、Clash、Surge、Hiddify、Loon、sing-box 匯入連結辨識。[相容範圍與限制](docs/client-compatibility.md)。此為訂閱網址解析，並非新增自動探索；流量仍取決於服務商資料。
+> **build 50 已發佈**：鑰匙圈遷移、2 MiB 本文限制、重試與取消最佳化，以及同源 HTTPS 重新導向驗證。55 項自動測試及簽名候選包的 11 項真實鑰匙圈檢查通過，使用獨立模擬訂閱。**Developer ID 簽名，尚未經 Apple 公證。** [驗證範圍與剩餘限制](docs/security-hardening.md)。
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="字節貓糧：印有貓爪的暖金色糧袋圖示">
@@ -11,7 +11,7 @@
 
 字節貓糧是一款原生 macOS 選單列訂閱流量工具，用來查看**剩餘流量、已用流量、方案到期資訊與重置提醒**。它可自動探索受支援的 Clash 系用戶端及守候網路（SNTP）訂閱，也可手動加入 Quantumult／Quantumult X、Surge 使用的 HTTPS 訂閱連結，並解析 Shadowsocks SIP008 流量欄位。可顯示的資訊取決於服務商回傳的資料，具體條件請見下方相容性說明。
 
-> **1.2.0（49）測試版**：提供應用程式碼、首次使用歡迎頁及 Apple silicon（arm64）安裝包。已使用 Developer ID 簽署，**尚未經 Apple 公證**。[下載與完整更新說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49)。`preview/` 中的舊截圖為歷史資料。
+> **1.2.0（50）測試版**：提供應用程式碼、首次使用歡迎頁及 Apple silicon（arm64）安裝包。已使用 Developer ID 簽署，**尚未經 Apple 公證**。[下載與完整更新說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)。`preview/` 中的舊截圖為歷史資料。
 
 **App 內更新（build 47 起）**：點擊底部版本號可檢查更新或關閉自動檢查，安裝須由使用者確認。build 46 及更早版本須先手動安裝一次新版。更新檢查會連線至 GitHub，不傳送訂閱連結或流量資料；測試版使用獨立更新來源。
 
@@ -42,7 +42,7 @@
 
 ## 訂閱從哪裡來
 
-**目前版本相容範圍（build 49）**：自動探索與手動匯入是兩種不同能力。Stash、Clash、Surge、Hiddify、Loon、sing-box 的受支援匯入連結可直接貼上，App 僅在本機擷取其中的 HTTPS 訂閱網址；Quantumult／Quantumult X 可手動加入原始 HTTPS 訂閱。服務商須回傳 `Subscription-Userinfo` 或受支援的 Shadowsocks SIP008 流量欄位。未新增這些用戶端的自動探索，也未宣稱完成所有用戶端／服務商聯測。[詳細格式與官方依據](docs/client-compatibility.md)。
+**目前版本相容範圍（build 50）**：自動探索與手動匯入是兩種不同能力。Stash、Clash、Surge、Hiddify、Loon、sing-box 的受支援匯入連結可直接貼上，App 僅在本機擷取其中的 HTTPS 訂閱網址；Quantumult／Quantumult X 可手動加入原始 HTTPS 訂閱。服務商須回傳 `Subscription-Userinfo` 或受支援的 Shadowsocks SIP008 流量欄位。未新增這些用戶端的自動探索，也未宣稱完成所有用戶端／服務商聯測。[詳細格式與官方依據](docs/client-compatibility.md)。
 
 | 來源／用戶端 | 讀取或匯入方式 | 說明 |
 | --- | --- | --- |
@@ -76,7 +76,7 @@
 
 需要 **macOS 13 或更新版本**。原生 Liquid Glass 樣式需要 macOS 26 或更新版本；舊系統使用相容樣式。安裝包支援的處理器架構、簽署與公證狀態，以對應版本說明為準。
 
-從 [1.2.0（49）發布頁](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build49) 下載 DMG 或 ZIP。先結束舊版 App；開啟 DMG 後將 ByteKibble 拖到 Applications，或將 ZIP 解壓縮後移入「應用程式」。請從「應用程式」啟動，而非持續執行磁碟映像內的副本。首次使用會顯示歡迎頁。
+從 [1.2.0（50）發布頁](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50) 下載 DMG 或 ZIP。先結束舊版 App；開啟 DMG 後將 ByteKibble 拖到 Applications，或將 ZIP 解壓縮後移入「應用程式」。請從「應用程式」啟動，而非持續執行磁碟映像內的副本。首次使用會顯示歡迎頁。
 
 本次二進位檔僅提供 **Apple silicon（arm64）**，不含 Intel 版本。本機建置、測試與介面檢查在 macOS 27 上完成；最低部署目標為 macOS 13，不代表所有舊系統均已實機驗證。
 
@@ -94,7 +94,7 @@
 
 **本機解析不代表完全離線。** 重新整理流量需要請求訂閱服務商網址，並可能跟隨其 HTTPS 重新導向；服務商會收到請求所需的訂閱 URL／權杖。使用本機代理時，請求沿代理設定的路線傳送。檢查與下載更新會連線至 GitHub 及其下載服務，但更新器不接收訂閱連結、權杖或流量數據。關閉自動檢查更新不會停止流量重新整理。
 
-目前原始碼（尚未發佈至安裝包）將手動連結存入本機鑰匙圈；偏好設定只保留名稱與雜湊識別碼，選取狀態與手動重置日期索引不再保存原始連結。舊記錄僅在鑰匙圈寫入及讀回驗證成功後遷移；失敗時保留舊記錄並提示，不宣稱已加密。歷史備份與其他用戶端設定不會被清理，亦不能保證裝置遭入侵後仍安全。已發佈的 build 49 仍以偏好設定保存手動連結。
+build 50 將手動連結存入本機鑰匙圈；偏好設定只保留名稱與雜湊識別碼，選取狀態與手動重置日期索引不再保存原始連結。舊記錄僅在鑰匙圈寫入及讀回驗證成功後遷移；失敗時保留舊記錄並提示，不宣稱已加密。歷史備份與其他用戶端設定不會被清理，亦不能保證裝置遭入侵後仍安全。
 
 目前原始碼保留系統 TLS 驗證，只允許同一 HTTPS 網域及連接埠的重新導向；跨網域連結須手動加入最終網址。取得流量標頭後停止下載本文；沒有流量標頭的 SIP008 本文上限為 2 MiB。只有暫時連線錯誤會嘗試其他本機代理路徑，HTTP、憑證及解析錯誤不會；自動重試採退避，手動重新整理仍可立即重試。介面不顯示可能含權杖的原始網路錯誤。
 
@@ -125,4 +125,3 @@ swift build -c release
 由 [MU Labs](https://mustundead.com) 出品。程式碼重用、署名與商業授權要求見 [LICENSE](LICENSE)。
 
 **不追溯既有授權。** 先前依 MIT 提供的程式碼與版本（包括 1.2.0（41）驗收包）仍適用[原 MIT 授權](LICENSES/MIT-legacy.txt)，既有商用權利不受影響。新發布內容的適用範圍以 [LICENSE](LICENSE) 為準。
-> **目前原始碼 / 本機 build 50（尚未發佈）**：已實作鑰匙圈遷移、2 MiB 本文限制、重試與取消最佳化，以及同源 HTTPS 重新導向驗證。55 項自動測試及簽名候選包的 11 項真實鑰匙圈檢查通過，使用獨立模擬訂閱。**可下載版本仍為 build 49，尚未經 Apple 公證。** [驗證範圍與剩餘限制](docs/security-hardening.md)。
