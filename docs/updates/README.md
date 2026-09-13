@@ -33,8 +33,10 @@ The feed compares monotonically increasing CFBundleVersion, not just 1.2.0.
    configuration; `prepare-update-acceptance.sh` creates an isolated localhost
    test pair. Its localhost HTTP exception never enters production packages.
 
-An empty feed is intentional until an eligible signed update has been validated.
-Source integration is not evidence of a completed live OTA installation.
+Build 47 is published and the preview feed points to its signed application ZIP.
+All four GitHub asset digests match local files. The public application ZIP was
+downloaded again and its SHA-256 and EdDSA signature verified before publishing
+the feed. This is distribution verification, not a completed production OTA install.
 
 ## Local acceptance — 2026-09-13
 

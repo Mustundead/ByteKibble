@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
-  <channel>
-    <title>ByteKibble Preview Updates</title>
-    <link>https://github.com/mustundead/ByteKibble/releases</link>
-    <description>MU Labs — ByteKibble preview releases</description>
-    <language>zh-CN</language>
-  </channel>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>ByteKibble Preview Updates · MU Labs</title>
+        <link>https://github.com/mustundead/ByteKibble/releases</link>
+        <item>
+            <title>ByteKibble 1.2.0 (47)</title>
+            <pubDate>Sun, 13 Sep 2026 20:23:02 +0800</pubDate>
+            <sparkle:version>47</sparkle:version>
+            <sparkle:shortVersionString>1.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description><![CDATA[<h2>应用内更新 / In-app updates</h2><p>新增检查更新、自动检查开关和签名更新包。安装仍需用户确认。New update menu, automatic checks, and signed update packages. Installation requires confirmation.</p><p>Apple silicon 测试版，Developer ID 签名，尚未 Apple 公证。Apple silicon prerelease, Developer ID signed, not notarized.</p><p><a href="https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build47">完整更新说明 / Full release notes</a></p>]]></description>
+            <enclosure url="https://github.com/mustundead/ByteKibble/releases/download/v1.2.0-build47/ByteKibble-1.2.0-47-arm64.zip" length="5621935" type="application/octet-stream" sparkle:edSignature="JLhuN7u/YeDxxRLbRNCXe5b9mW7f12pBj6dEZ9SGyLNIdtkw4bpwPbM/jmbC26KwY8q5XV6fq8xvuvFYiEptAw=="/>
+        </item>
+    </channel>
 </rss>
