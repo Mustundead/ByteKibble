@@ -50,6 +50,14 @@ The menu bar pie represents **remaining** data. The horizontal bar in the detail
 | ClashX / ClashX Meta / ClashX Pro | Subscription links in client preferences | Depends on the client saving a readable configuration |
 | SNTP | Subscription link, plan and traffic cache, client-reported reset days | The cache may lack a trustworthy original update time |
 | Manual entry | An HTTPS subscription link you paste | The provider must supply parseable usage information |
+| Stash / Clash | Manually paste HTTPS or supported `install-config` links | Stash also supports the documented `link.stash.ws` configuration form |
+| Surge | HTTPS, managed-profile first line, or supported configuration import link | No configuration or modules are executed |
+| Hiddify | HTTPS or supported subscription import link | Preserves URL tokens; rejects individual nodes |
+| Loon / sing-box | HTTPS or supported subscription / remote-profile import link | No plugins, scripts or client control actions are executed |
+| Quantumult / Quantumult X | Original HTTPS subscription | Provider quota metadata is required |
+| Shadowsocks SIP008 | HTTPS subscription with `bytes_used` and `bytes_remaining` | Missing upload/download breakdown remains unknown |
+
+These build 49 additions are manual import parsing, not new automatic discovery. See [exact formats and official references](docs/client-compatibility.md). Unverified Shadowrocket-specific links and general VPN account balances are not claimed as supported.
 
 Live readings come from the subscription response's `subscription-userinfo` header, or SIP008 JSON quota fields when that header is absent. **Using the Mihomo core does not automatically make a client discoverable**: detection supports the storage formats listed above. For other clients, try adding the link manually.
 
@@ -81,6 +89,12 @@ If macOS blocks the app, verify the source, signature and release notes first. O
 Import a subscription into a supported client or add an HTTPS link in ByteKibble. The app lives in the menu bar. Launch at login is optional, not a requirement for viewing your allowance.
 
 ## Privacy and boundaries
+
+**Parsing runs locally on your Mac. Subscription links are not uploaded to MU Labs or an analytics platform.** Client discovery, import-link extraction and quota parsing do not use cloud analysis or third-party subscription conversion. Subscription scripts and configurations are not executed.
+
+**Local parsing does not mean offline operation.** Refreshing quota requests your subscription endpoint and may follow its HTTPS redirects; the provider receives the URL/token needed for that request. A local proxy may carry it through its configured route. Update checks and downloads contact GitHub and its download services, without passing subscription URLs, tokens or quota readings to the updater. Disabling automatic update checks does not disable quota refresh.
+
+Subscription requests retain system TLS certificate validation and reject HTTPS-to-HTTP redirects. User-facing errors omit raw network errors that may contain tokens. Manual links are stored in local preferences, **not encrypted Keychain storage**; this does not protect them against a compromised Mac or exposed local data/backups.
 
 Automatic discovery reads local client settings. Manually added links are stored in ByteKibble's local preferences. Adding, removing or undoing an entry changes only ByteKibble's list; **it does not modify or cancel the provider subscription**.
 
