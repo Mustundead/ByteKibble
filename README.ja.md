@@ -11,9 +11,9 @@ ByteKibble は、macOS のメニューバーでサブスクリプションの通
 
 > **1.2.0（45）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45)。`preview/` 内の画像は過去のバージョンです。
 
-<img src="docs/assets/quota-build45-qa-dark.png" width="360" alt="1.2.0（45）ネイティブ QA ダーク表示（テストデータ、実際の契約ではありません）">
+<img src="docs/assets/quota-build45-full-dark.png" width="360" alt="ネイティブメニューの実行画面 · 残り通信量 100%（サンプルデータ、実際の契約ではありません）">
 
-1.2.0（45）ネイティブ QA ダーク表示（テストデータ、実際の契約ではありません）
+ネイティブメニューの実行画面 · 残り通信量 100%（サンプルデータ、実際の契約ではありません）
 
 ## できること
 

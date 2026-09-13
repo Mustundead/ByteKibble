@@ -11,9 +11,9 @@
 
 > **1.2.0（45）测试版**：提供应用源码、首次使用欢迎页和 Apple silicon（arm64）安装包。已使用 Developer ID 签名，**尚未 Apple 公证**。[下载与完整更新说明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45)。`preview/` 中的旧截图为历史资料。
 
-<img src="docs/assets/quota-build45-qa-dark.png" width="360" alt="1.2.0（45）原生 QA 深色预览（模拟数据，非真实订阅）">
+<img src="docs/assets/quota-build45-full-dark.png" width="360" alt="原生菜单弹窗实拍 · 剩余流量 100%（示例数据，非真实订阅）">
 
-1.2.0（45）原生 QA 深色预览（模拟数据，非真实订阅）
+原生菜单弹窗实拍 · 剩余流量 100%（示例数据，非真实订阅）
 
 ## 一眼看懂流量
 

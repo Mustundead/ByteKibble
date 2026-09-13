@@ -11,9 +11,9 @@ ByteKibble은 macOS 메뉴 막대에서 구독 데이터 사용량을 확인하�
 
 > **1.2.0 (45) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). `preview/`의 이미지는 과거 버전입니다.
 
-<img src="docs/assets/quota-build45-qa-dark.png" width="360" alt="1.2.0 (45) 네이티브 QA 다크 미리보기 (가상 데이터, 실제 구독 아님)">
+<img src="docs/assets/quota-build45-full-dark.png" width="360" alt="네이티브 메뉴 실행 화면 · 잔여 데이터 100% (예시 데이터, 실제 구독 아님)">
 
-1.2.0 (45) 네이티브 QA 다크 미리보기 (가상 데이터, 실제 구독 아님)
+네이티브 메뉴 실행 화면 · 잔여 데이터 100% (예시 데이터, 실제 구독 아님)
 
 ## 주요 기능
 

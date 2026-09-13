@@ -65,6 +65,13 @@ final class MenuPopoverController: NSObject, NSPopoverDelegate {
     }
 
 #if BYTEKIBBLE_ACCEPTANCE
+    func showScreenshotPreview() {
+        if !popover.isShown { togglePopover() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.popover.contentViewController?.view.window?.makeFirstResponder(nil)
+        }
+    }
+
     func setPreviewAppearance(dark: Bool) {
         popover.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
     }

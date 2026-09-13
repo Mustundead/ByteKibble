@@ -63,6 +63,20 @@ struct AcceptanceHarness: View {
     init() {
         let source = FixtureSource()
         self.source = source
+        if CommandLine.arguments.contains("--readme-screenshot") {
+            let vm = ViewModel(preview: true, defaults: source.defaults)
+            let target = SubTarget(id: "readme-example", name: "Premium", origin: "sntp",
+                                   url: "https://example.com/sub", cached: nil)
+            vm.targets = [target]
+            vm.selectedID = target.id
+            vm.samples[target.id] = QuotaSample(uploaded: 0, downloaded: 0,
+                total: 1000 * 1_073_741_824,
+                expireAt: Date().addingTimeInterval(180 * 86400), resetDay: 30,
+                fetchedAt: Date(), source: .live)
+            _vm = StateObject(wrappedValue: vm)
+            _dark = State(initialValue: true)
+            return
+        }
         _vm = StateObject(wrappedValue: ViewModel(defaults: source.defaults,
             scan: { source.clients + Providers.custom(defaults: source.defaults) },
             fetch: { try await source.fetch($0) }))
@@ -112,6 +126,11 @@ struct AcceptanceHarness: View {
             if menuPreview == nil {
                 menuPreview = MenuPopoverController(vm: vm, allowsSystemChanges: false)
                 menuPreview?.setPreviewAppearance(dark: dark)
+                if CommandLine.arguments.contains("--readme-screenshot") {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        menuPreview?.showScreenshotPreview()
+                    }
+                }
             }
         }
         .onChange(of: dark) { value in menuPreview?.setPreviewAppearance(dark: value) }

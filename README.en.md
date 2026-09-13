@@ -11,9 +11,9 @@ ByteKibble is a native macOS menu bar utility for subscription traffic allowance
 
 > **1.2.0 (45) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). Images in `preview/` are historical.
 
-<img src="docs/assets/quota-build45-qa-dark.png" width="360" alt="1.2.0 (45) native dark QA preview (synthetic data, not a real subscription)">
+<img src="docs/assets/quota-build45-full-dark.png" width="360" alt="Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)">
 
-1.2.0 (45) native dark QA preview (synthetic data, not a real subscription)
+Native menu popover screenshot · 100% traffic remaining (sample data, not a real subscription)
 
 ## What it shows
 
