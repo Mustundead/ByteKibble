@@ -9,14 +9,18 @@
 
 ByteKibble is a native macOS menu bar utility for subscription traffic allowances. For users of Clash-family clients and SNTP, it answers one simple question: **how much data is left on this subscription?** Check usage, expiry and data sources without repeatedly opening a client or provider website.
 
-> **1.2.0 (43) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0). Images in `preview/` are historical.
+> **1.2.0 (45) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). Images in `preview/` are historical.
+
+<img src="docs/assets/quota-build45-qa-dark.png" width="360" alt="1.2.0 (45) native dark QA preview (synthetic data, not a real subscription)">
+
+1.2.0 (45) native dark QA preview (synthetic data, not a real subscription)
 
 ## What it shows
 
 - **Remaining data in your menu bar.** The number shows remaining allowance; the filled pie shows the remaining proportion. A countdown appears when client reset data is available.
 - **Details in one panel.** Plan name, remaining/used/total data, upload and download usage, estimated reset date, subscription expiry, source and update time.
 - **Multiple subscriptions.** Discover readable client subscriptions or manually add an HTTPS subscription link, then switch between their readings.
-- **Useful warnings.** Orange below 20% remaining; red below 7%. Text identifies low or exhausted allowance, so color is not the only signal.
+- **Useful warnings.** Orange below 20% remaining; red below 10%. Text identifies low or exhausted allowance, so color is not the only signal.
 - **Native macOS behavior.** SwiftUI, light and dark appearances, monospaced numbers, Reduce Motion support and explicit launch-at-login on/off states.
 - **Five interface languages.** Simplified Chinese, Traditional Chinese, English, Korean and Japanese.
 
@@ -27,8 +31,8 @@ ByteKibble is **not a proxy client, VPN, speed test or per-app network meter**. 
 | Remaining share | Appearance | Meaning |
 | --- | --- | --- |
 | ≥20% | Adaptive black/white primary color | Normal |
-| ≥7% and <20% | Orange | Running low |
-| <7% | Red | Very low or exhausted |
+| ≥10% and <20% | Orange | Running low |
+| <10% | Red | Very low or exhausted |
 
 The menu bar pie represents **remaining** data. The horizontal bar in the detail card represents **used** data, matching its “Used” percentage. Warning colors describe allowance risk—not plan tier, connectivity or login-item state. An approaching reset is not itself a failure.
 
@@ -56,7 +60,7 @@ ByteKibble does not measure all network activity itself. Readings depend on the 
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Download the DMG or ZIP from the [1.2.0 (43) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+Download the DMG or ZIP from the [1.2.0 (45) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build45). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
 
 This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
 

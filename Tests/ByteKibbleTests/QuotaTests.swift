@@ -6,10 +6,10 @@ final class QuotaTests: XCTestCase {
         for ratio in [1.0, 0.5, 0.2] {
             XCTAssertEqual(WarningLevel.level(remainingRatio: ratio), .normal)
         }
-        for ratio in [0.1999, 0.0866, 0.07] {
+        for ratio in [0.1999, 0.1001, 0.10] {
             XCTAssertEqual(WarningLevel.level(remainingRatio: ratio), .warn)
         }
-        for ratio in [0.0699, 0, -0.1] {
+        for ratio in [0.0999, 0.0866, 0.07, 0, -0.1] {
             XCTAssertEqual(WarningLevel.level(remainingRatio: ratio), .danger)
         }
     }

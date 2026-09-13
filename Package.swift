@@ -10,6 +10,7 @@ let package = Package(
             name: "ByteKibble",
             path: "Sources/ByteKibble",
             resources: [
+                .copy("Resources/QuotaBag.png"),
                 .copy("Resources/WelcomeArtwork.png"),
                 .copy("Resources/MULabsWordmark.png"),
                 .copy("Resources/catfood.svg"),

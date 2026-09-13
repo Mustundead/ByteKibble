@@ -44,7 +44,7 @@ enum WarningLevel {
     case normal, warn, danger
 
     static func level(remainingRatio r: Double) -> WarningLevel {
-        if r < 0.07 { return .danger }
+        if r < 0.10 { return .danger }
         if r < 0.2 { return .warn }
         return .normal
     }

@@ -451,6 +451,7 @@ struct MenuView: View {
     @ScaledMetric(relativeTo: .largeTitle) private var quotaFontSize = 34.0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.colorScheme) private var colorScheme
     private var displayedLoginStatus: SMAppService.Status { loginStatusOverride ?? loginStatus }
 
     private func tr(_ value: String) -> String { L10n.t(value) }
@@ -554,14 +555,6 @@ struct MenuView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 6)
-            .background(alignment: .trailing) {
-                PawPrint(color: Color.primary.opacity(0.045))
-                    .frame(width: 64, height: 64)
-                    .rotationEffect(.degrees(-15))
-                    .padding(.trailing, 4)
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
-            }
             GradientBar(ratio: sample.usedRatio, level: vm.warningLevel, reduceMotionOverride: reduceMotionOverride)
             HStack(alignment: .firstTextBaseline) {
                 Text(L10n.used(Fmt.bytes(sample.used)))
@@ -595,6 +588,22 @@ struct MenuView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(alignment: .bottomTrailing) {
+            if let url = Bundle.module.url(forResource: "QuotaBag", withExtension: "png"),
+               let artwork = NSImage(contentsOf: url) {
+                Image(nsImage: artwork)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 230, height: 230)
+                    .saturation(0)
+                    .brightness(colorScheme == .dark ? 0 : -0.55)
+                    .opacity(colorScheme == .dark ? 0.14 : 0.12)
+                    .offset(x: 60, y: 40)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .glassCard(in: RoundedRectangle(cornerRadius: 16))
         .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(
             Color.primary.opacity((highContrastOverride ?? (contrast == .increased)) ? 0.55 : 0), lineWidth: 1))
@@ -850,22 +859,15 @@ struct PawPrint: View {
     }
 }
 
-/// Rounded three-toe watermark, with a soft central pad rather than a circle.
+/// Three-toe watermark with a circular central pad and uniform scaling.
 struct BrandPawShape: Shape {
     func path(in rect: CGRect) -> Path {
         var source = Path()
-        source.move(to: CGPoint(x: 50, y: 44))
-        source.addCurve(to: CGPoint(x: 24, y: 65), control1: CGPoint(x: 39, y: 44), control2: CGPoint(x: 34, y: 56))
-        source.addCurve(to: CGPoint(x: 25, y: 87), control1: CGPoint(x: 12, y: 77), control2: CGPoint(x: 15, y: 86))
-        source.addCurve(to: CGPoint(x: 50, y: 84), control1: CGPoint(x: 34, y: 90), control2: CGPoint(x: 40, y: 84))
-        source.addCurve(to: CGPoint(x: 75, y: 87), control1: CGPoint(x: 60, y: 84), control2: CGPoint(x: 66, y: 90))
-        source.addCurve(to: CGPoint(x: 76, y: 65), control1: CGPoint(x: 85, y: 86), control2: CGPoint(x: 88, y: 77))
-        source.addCurve(to: CGPoint(x: 50, y: 44), control1: CGPoint(x: 66, y: 56), control2: CGPoint(x: 61, y: 44))
-        source.closeSubpath()
-        for (center, angle) in [(CGPoint(x: 22, y: 34), -25.0),
-                                (CGPoint(x: 50, y: 20), 0.0),
-                                (CGPoint(x: 78, y: 34), 25.0)] {
-            let toe = Path(ellipseIn: CGRect(x: -10, y: -14, width: 20, height: 28))
+        source.addEllipse(in: CGRect(x: 25, y: 44, width: 50, height: 50))
+        for (center, angle) in [(CGPoint(x: 20.5, y: 36), -30.0),
+                                (CGPoint(x: 50, y: 24.5), 0.0),
+                                (CGPoint(x: 79.5, y: 36), 30.0)] {
+            let toe = Path(ellipseIn: CGRect(x: -11.5, y: -12.5, width: 23, height: 25))
                 .applying(CGAffineTransform(rotationAngle: angle * .pi / 180))
                 .applying(CGAffineTransform(translationX: center.x, y: center.y))
             source.addPath(toe)
