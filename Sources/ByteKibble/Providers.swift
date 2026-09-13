@@ -6,8 +6,8 @@ import Foundation
 /// - ClashX / ClashX Meta：defaults 里的 kRemoteConfigs（JSON 数组）
 /// - 手动添加：用户粘贴的任意机场订阅链接
 enum Providers {
-    static func scanAll() -> [SubTarget] {
-        let list = sntp() + verge() + clashX() + custom()
+    static func scanAll(defaults: UserDefaults = .standard) -> [SubTarget] {
+        let list = sntp() + verge() + clashX() + custom(defaults: defaults)
         var out: [SubTarget] = []
         for t in list {
             let key = dedupeKey(t.url)
@@ -35,17 +35,32 @@ enum Providers {
         else { return [] }
 
         let plan = (si["plan"] as? [String: Any])?["name"] as? String
-        let sample = QuotaSample(
-            uploaded: i64(si["u"]),
-            downloaded: i64(si["d"]),
-            total: i64(si["transfer_enable"]),
-            expireAt: Date(timeIntervalSince1970: Double(i64(si["expired_at"]))),
-            resetDay: si["reset_day"] as? Int,
-            planName: plan,
-            fetchedAt: Date(),
-            source: .cache
-        )
+        let sample = clientSample(si)
         return [SubTarget(id: url, name: plan ?? "守候网络", origin: "sntp", url: url, cached: sample)]
+    }
+
+    static func clientSample(_ info: [String: Any]) -> QuotaSample? {
+        guard let upload = nonnegativeInteger(info["u"]),
+              let download = nonnegativeInteger(info["d"]),
+              let total = nonnegativeInteger(info["transfer_enable"]), total > 0 else { return nil }
+        let expiry = nonnegativeInteger(info["expired_at"])
+        let reset = nonnegativeInteger(info["reset_day"]).flatMap { (0...40).contains($0) ? Int($0) : nil }
+        return QuotaSample(uploaded: upload, downloaded: download, total: total,
+                           expireAt: expiry.flatMap { $0 > 0 ? Date(timeIntervalSince1970: Double($0)) : nil },
+                           resetDay: reset, planName: (info["plan"] as? [String: Any])?["name"] as? String,
+                           fetchedAt: nil, source: .cache)
+    }
+
+    private static func nonnegativeInteger(_ value: Any?) -> Int64? {
+        guard let value else { return nil }
+        let text: String
+        if let string = value as? String { text = string }
+        else if let number = value as? NSNumber {
+            guard CFGetTypeID(number) != CFBooleanGetTypeID() else { return nil }
+            text = number.stringValue
+        } else { return nil }
+        guard let result = Int64(text), result >= 0 else { return nil }
+        return result
     }
 
     // MARK: - Clash Verge (Rev)
@@ -60,7 +75,8 @@ enum Providers {
             let path = (c as NSString).expandingTildeInPath
             guard let text = try? String(contentsOfFile: path, encoding: .utf8) else { continue }
             targets += regexMatches(#"url:\s*["']?(https?://[^\s"']+)"#, in: text).compactMap { m in
-                guard let url = m.first else { return nil }
+                guard m.count > 1 else { return nil }
+                let url = m[1]
                 return SubTarget(id: url, name: host(url), origin: "verge", url: url, cached: nil)
             }
         }
@@ -95,25 +111,25 @@ enum Providers {
 
     private static let customKey = "customTargets"
 
-    private static func custom() -> [SubTarget] {
-        guard let arr = UserDefaults.standard.array(forKey: customKey) as? [[String: String]] else { return [] }
+    static func custom(defaults: UserDefaults = .standard) -> [SubTarget] {
+        guard let arr = defaults.array(forKey: customKey) as? [[String: String]] else { return [] }
         return arr.compactMap { d in
             guard let url = d["url"], url.hasPrefix("http") else { return nil }
             return SubTarget(id: url, name: d["name"] ?? host(url), origin: "custom", url: url, cached: nil)
         }
     }
 
-    static func addCustom(url: String) {
-        guard url.hasPrefix("http") else { return }
-        let ud = UserDefaults.standard
+    static func addCustom(url: String, defaults: UserDefaults = .standard) {
+        guard validatedURL(url) != nil else { return }
+        let ud = defaults
         var arr = (ud.array(forKey: customKey) as? [[String: String]]) ?? []
         guard !arr.contains(where: { $0["url"] == url }) else { return }
         arr.append(["url": url, "name": host(url)])
         ud.set(arr, forKey: customKey)
     }
 
-    static func removeCustom(url: String) {
-        let ud = UserDefaults.standard
+    static func removeCustom(url: String, defaults: UserDefaults = .standard) {
+        let ud = defaults
         var arr = (ud.array(forKey: customKey) as? [[String: String]]) ?? []
         arr.removeAll { $0["url"] == url }
         ud.set(arr, forKey: customKey)
@@ -122,16 +138,24 @@ enum Providers {
     // MARK: - 工具
 
     /// 用 token 参数做去重键：同一账号在不同客户端里签名参数不同但 token 相同
-    private static func dedupeKey(_ url: String) -> String {
+    static func dedupeKey(_ url: String) -> String {
         if let c = URLComponents(string: url),
            let token = c.queryItems?.first(where: { $0.name == "token" })?.value, !token.isEmpty {
-            return token
+            return "\(c.scheme ?? "")://\(c.host ?? ""):\(c.port ?? 443)\(c.path)|\(token)"
         }
         return url
     }
 
     private static func host(_ url: String) -> String {
-        URLComponents(string: url)?.host ?? url
+        URLComponents(string: url)?.host ?? L10n.t("订阅")
+    }
+
+    static func validatedURL(_ text: String) -> URL? {
+        guard let c = URLComponents(string: text), c.scheme?.lowercased() == "https",
+              let host = c.host, !host.isEmpty, c.user == nil, c.password == nil,
+              c.fragment == nil, !text.contains(where: { $0.isWhitespace }),
+              let url = c.url else { return nil }
+        return url
     }
 
     private static func i64(_ any: Any?) -> Int64 {

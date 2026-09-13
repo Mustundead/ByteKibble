@@ -14,15 +14,15 @@ enum Fmt {
 
     static func date(_ d: Date) -> String {
         let f = DateFormatter()
-        f.locale = Locale(identifier: "zh_CN")
-        f.dateFormat = "yyyy-M-d"
+        f.locale = L10n.locale
+        f.dateStyle = .medium
         return f.string(from: d)
     }
 
     static func shortDate(_ d: Date) -> String {
         let f = DateFormatter()
-        f.locale = Locale(identifier: "zh_CN")
-        f.dateFormat = "M月d日"
+        f.locale = L10n.locale
+        f.setLocalizedDateFormatFromTemplate("MMMd")
         return f.string(from: d)
     }
 
@@ -32,11 +32,26 @@ enum Fmt {
         return Calendar.current.date(byAdding: .day, value: days, to: now)
     }
 
-    static func daysUntil(_ d: Date) -> Int {
+    static func daysUntil(_ d: Date, now: Date = Date()) -> Int {
         let cal = Calendar.current
         return max(0, cal.dateComponents([.day],
-                                         from: cal.startOfDay(for: Date()),
+                                         from: cal.startOfDay(for: now),
                                          to: cal.startOfDay(for: d)).day ?? 0)
+    }
+
+    static func percent(_ ratio: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = L10n.locale
+        formatter.numberStyle = .percent
+        formatter.maximumFractionDigits = 1
+        return formatter.string(from: NSNumber(value: max(0, ratio))) ?? "—"
+    }
+
+    static func relative(_ date: Date, now: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = L10n.locale
+        formatter.unitsStyle = .full
+        return formatter.localizedString(for: date, relativeTo: now)
     }
 
     static func ago(_ d: Date) -> String {

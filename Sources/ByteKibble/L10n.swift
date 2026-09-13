@@ -2,8 +2,37 @@ import Foundation
 
 /// 本地化：以简体中文文案为 key，缺表时自动回退 key 本身（即简体）
 enum L10n {
+#if BYTEKIBBLE_ACCEPTANCE
+    private static let acceptanceLock = NSLock()
+    private static var acceptanceLanguage = "en"
+    static func setAcceptanceLanguage(_ language: String) {
+        acceptanceLock.lock()
+        acceptanceLanguage = language
+        acceptanceLock.unlock()
+    }
+    private static var selectedAcceptanceLanguage: String {
+        acceptanceLock.lock()
+        defer { acceptanceLock.unlock() }
+        return acceptanceLanguage
+    }
+#endif
+
+    static var locale: Locale {
+#if BYTEKIBBLE_ACCEPTANCE
+        Locale(identifier: selectedAcceptanceLanguage)
+#else
+        .current
+#endif
+    }
+
     static func t(_ key: String) -> String {
-        Bundle.module.localizedString(forKey: key, value: key, table: nil)
+#if BYTEKIBBLE_ACCEPTANCE
+        if let path = Bundle.module.path(forResource: selectedAcceptanceLanguage, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            return bundle.localizedString(forKey: key, value: key, table: nil)
+        }
+#endif
+        return Bundle.module.localizedString(forKey: key, value: key, table: nil)
     }
 
     static func f(_ key: String, _ args: CVarArg...) -> String {

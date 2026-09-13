@@ -10,12 +10,16 @@ let package = Package(
             name: "ByteKibble",
             path: "Sources/ByteKibble",
             resources: [
+                .copy("Resources/WelcomeArtwork.png"),
+                .copy("Resources/MULabsWordmark.png"),
                 .copy("Resources/catfood.svg"),
                 .copy("Resources/en.lproj"),
+                .copy("Resources/zh-Hans.lproj"),
                 .copy("Resources/zh-Hant.lproj"),
                 .copy("Resources/ja.lproj"),
                 .copy("Resources/ko.lproj")
             ]
-        )
+        ),
+        .testTarget(name: "ByteKibbleTests", dependencies: ["ByteKibble"])
     ]
 )

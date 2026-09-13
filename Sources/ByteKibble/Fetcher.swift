@@ -3,78 +3,114 @@ import Foundation
 /// 通过订阅链接的 `subscription-userinfo` 响应头实时查询流量（Clash 通用做法）。
 /// 三个要点：
 /// 1. 订阅域名直连经常不通，依次尝试直连和常见本地代理混合端口；
-/// 2. 部分机场 TLS 配置不规范，需对订阅域放行证书校验（与 curl -k、各类客户端行为一致）；
+/// 2. 保留系统 TLS 证书验证，并拒绝降级到 HTTP 的重定向；
 /// 3. 面板通常按 User-Agent 决定是否下发流量头，使用 clash-verge UA。
 enum Fetcher {
-    struct Failure: Error { let message: String }
+    struct Failure: Error {
+        let message: String
+        var priority: Int = 1
+    }
 
     /// 0 = 直连；其余为各家客户端默认混合端口（守候网络 7899、ClashX 7890、Verge 7897）
     private static let transports: [Int] = [0, 7899, 7890, 7897]
-    private static var goodPort: Int?
+    private actor TransportMemory {
+        private var ports: [String: Int] = [:]
+        func port(for host: String) -> Int? { ports[host] }
+        func remember(_ port: Int, for host: String) {
+            if ports.count > 32 { ports.removeAll() }
+            ports[host] = port
+        }
+    }
+    private static let transportMemory = TransportMemory()
 
-    private final class TrustSubscriptionTLS: NSObject, URLSessionDelegate {
-        func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
-                        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-               let trust = challenge.protectionSpace.serverTrust {
-                completionHandler(.useCredential, URLCredential(trust: trust))
-            } else {
-                completionHandler(.performDefaultHandling, nil)
-            }
+    private final class SecureRedirects: NSObject, URLSessionTaskDelegate {
+        func urlSession(_ session: URLSession, task: URLSessionTask,
+                        willPerformHTTPRedirection response: HTTPURLResponse,
+                        newRequest request: URLRequest,
+                        completionHandler: @escaping (URLRequest?) -> Void) {
+            completionHandler(request.url?.scheme?.lowercased() == "https" ? request : nil)
         }
     }
 
     static func fetch(url: String) async throws -> QuotaSample {
+        guard let parsed = Providers.validatedURL(url), let host = parsed.host else {
+            throw Failure(message: L10n.t("请输入有效的 HTTPS 订阅链接。"))
+        }
+        let goodPort = await transportMemory.port(for: host)
         let order: [Int] = goodPort.map { g in [g] + transports.filter { $0 != g } } ?? transports
-        var last = Failure(message: "未知错误")
+        var last = Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
         for port in order {
             do {
                 let sample = try await attempt(url: url, port: port)
-                goodPort = port
+                await transportMemory.remember(port, for: host)
                 return sample
             } catch {
-                last = (error as? Failure) ?? Failure(message: String(describing: error))
+                // Never include a raw URLSession error: it can contain a subscription token.
+                let failure = (error as? Failure) ?? Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
+                if failure.priority >= last.priority { last = failure }
             }
         }
         throw last
     }
 
-    private static func attempt(url: String, port: Int) async throws -> QuotaSample {
-        guard let u = URL(string: url) else { throw Failure(message: "订阅链接无效") }
+    static func attempt(url: String, port: Int) async throws -> QuotaSample {
+        guard let u = Providers.validatedURL(url) else { throw Failure(message: L10n.t("请输入有效的 HTTPS 订阅链接。")) }
         let cfg = URLSessionConfiguration.ephemeral
         cfg.timeoutIntervalForRequest = 6
         cfg.timeoutIntervalForResource = 10
         cfg.requestCachePolicy = .reloadIgnoringLocalCacheData
+        cfg.connectionProxyDictionary = ["HTTPEnable": 0, "HTTPSEnable": 0]
         if port != 0 {
             cfg.connectionProxyDictionary = [
                 "HTTPEnable": 1, "HTTPProxy": "127.0.0.1", "HTTPPort": port,
                 "HTTPSEnable": 1, "HTTPSProxy": "127.0.0.1", "HTTPSPort": port,
             ]
         }
-        let session = URLSession(configuration: cfg, delegate: TrustSubscriptionTLS(), delegateQueue: nil)
+        let session = URLSession(configuration: cfg, delegate: SecureRedirects(), delegateQueue: nil)
         defer { session.finishTasksAndInvalidate() }
 
         var req = URLRequest(url: u)
         req.setValue("clash-verge/1.7.7", forHTTPHeaderField: "User-Agent")
         // GET：部分面板对 HEAD 不返回 userinfo 头；配置体通常只有几百 KB
-        let (_, resp) = try await session.data(for: req)
-        guard let http = resp as? HTTPURLResponse else { throw Failure(message: "非 HTTP 响应") }
-        guard (200..<300).contains(http.statusCode) else { throw Failure(message: "HTTP \(http.statusCode)") }
+        let resp: URLResponse
+        do { (_, resp) = try await session.data(for: req) }
+        catch let error as URLError {
+            switch error.code {
+            case .serverCertificateUntrusted, .serverCertificateHasBadDate, .serverCertificateHasUnknownRoot,
+                 .serverCertificateNotYetValid, .secureConnectionFailed:
+                throw Failure(message: L10n.t("无法验证订阅服务器的安全连接。请联系服务商检查证书。"), priority: 2)
+            default:
+                throw Failure(message: L10n.t("无法连接。请检查网络和代理客户端后重试。"))
+            }
+        }
+        guard let http = resp as? HTTPURLResponse else { throw Failure(message: L10n.t("订阅服务器返回了无效响应。")) }
+        guard (200..<300).contains(http.statusCode) else { throw Failure(message: L10n.f("订阅服务器返回 HTTP %@。请检查链接或联系服务商。", String(http.statusCode)), priority: 3) }
 
         guard let header = http.value(forHTTPHeaderField: "Subscription-Userinfo") else {
-            throw Failure(message: "响应中没有流量信息")
+            throw Failure(message: L10n.t("订阅未提供流量信息。请联系服务商确认支持情况。"), priority: 3)
         }
+        return try parse(header: header)
+    }
+
+    static func parse(header: String) throws -> QuotaSample {
         var dict: [String: Int64] = [:]
-        for m in Providers.regexMatches(#"([A-Za-z]+)\s*=\s*(\d+)"#, in: header) {
-            guard m.count >= 3, let v = Int64(m[2]) else { continue }
-            dict[m[1].lowercased()] = v
+        for part in header.split(separator: ";") {
+            let pair = part.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            guard let key = pair.first?.lowercased(), ["upload", "download", "total", "expire"].contains(key) else { continue }
+            guard pair.count == 2, let value = Int64(pair[1]), value >= 0, dict[key] == nil else {
+                throw Failure(message: L10n.t("订阅流量信息不完整，无法计算剩余量。"), priority: 3)
+            }
+            dict[key] = value
         }
-        guard let total = dict["total"] else { throw Failure(message: "流量头缺少 total") }
+        guard let total = dict["total"], total > 0,
+              let upload = dict["upload"], let download = dict["download"] else {
+            throw Failure(message: L10n.t("订阅流量信息不完整，无法计算剩余量。"), priority: 3)
+        }
         return QuotaSample(
-            uploaded: dict["upload"] ?? 0,
-            downloaded: dict["download"] ?? 0,
+            uploaded: upload,
+            downloaded: download,
             total: total,
-            expireAt: dict["expire"].map { Date(timeIntervalSince1970: TimeInterval($0)) },
+            expireAt: dict["expire"].flatMap { $0 > 0 ? Date(timeIntervalSince1970: TimeInterval($0)) : nil },
             resetDay: nil,
             planName: nil,
             fetchedAt: Date(),

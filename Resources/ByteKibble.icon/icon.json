@@ -1,0 +1,16 @@
+{
+  "features": ["refractivity", "specular-location"],
+  "fill-specializations": [
+    {"value": {"linear-gradient": ["srgb:1.00000,0.94500,0.71500,1.00000", "srgb:1.00000,0.79500,0.34500,1.00000"]}},
+    {"appearance": "dark", "value": {"linear-gradient": ["srgb:0.19000,0.17500,0.15500,1.00000", "srgb:0.07500,0.07000,0.06500,1.00000"]}}
+  ],
+  "groups": [{
+    "name": "Original bag · native glass",
+    "layers": [{"image-name": "bag.png", "name": "Original orange and ivory bag", "glass": true}],
+    "refractivity": {"enabled": true, "depth": 0.65, "strength": 0.65},
+    "translucency": {"enabled": true, "value": 0.4},
+    "specular": "inside",
+    "shadow": {"kind": "neutral", "opacity": 0.3}
+  }],
+  "supported-platforms": {"squares": "shared"}
+}

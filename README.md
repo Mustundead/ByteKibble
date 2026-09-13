@@ -9,7 +9,7 @@
 
 字节猫粮是一款原生 macOS 菜单栏订阅流量工具，为 Clash 系客户端和守候网络（SNTP）用户提供一个简单的答案：**这份订阅还剩多少流量？** 不必反复打开客户端或服务商网站，点开菜单栏即可查看用量、到期信息与数据来源。
 
-> **当前状态：文档与图标先行更新。** 本页介绍正在完善的新版本。对应的应用代码、首次使用欢迎页及 ZIP／DMG 安装包尚未随本次更新发布。旧代码和 `preview/` 中的历史截图不代表本页所述的新设计；下载以 [Releases](https://github.com/mustundead/ByteKibble/releases) 中实际发布的版本为准。
+> **1.2.0（43）测试版**：提供应用源码、首次使用欢迎页和 Apple silicon（arm64）安装包。已使用 Developer ID 签名，**尚未 Apple 公证**。[下载与完整更新说明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0)。`preview/` 中的旧截图为历史资料。
 
 ## 一眼看懂流量
 
@@ -56,7 +56,13 @@
 
 需要 **macOS 13 或更高版本**。原生 Liquid Glass 样式需要 macOS 26 或更高版本；旧系统使用兼容样式。安装包支持的处理器架构、签名和公证状态以对应发布说明为准。
 
-拖拽安装的 ZIP／DMG 和一页式欢迎介绍仍在准备中，**本次文档更新不附带新安装包**。发布后从本仓库的 [Releases](https://github.com/mustundead/ByteKibble/releases) 获取：ZIP 解压后将应用移入“应用程序”；DMG 打开后将应用拖向“应用程序”快捷方式，再从“应用程序”启动。
+从 [1.2.0（43）发布页](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0) 下载 DMG 或 ZIP。先退出正在运行的旧版；DMG 打开后将 ByteKibble 拖到 Applications，ZIP 则解压后将应用移入“应用程序”。从“应用程序”启动，不要一直运行磁盘映像内的副本。首次使用会显示欢迎页。
+
+本次二进制仅提供 **Apple silicon（arm64）**，不包含 Intel 版本。本地构建、测试及界面检查在 macOS 27 上完成；最低部署目标为 macOS 13，不代表所有旧系统均已实机验证。
+
+推荐下载 `-installer.zip`：解压得到 DMG，并保留 App 主图与右下角开盒子角标。直接通过 HTTP 下载裸 DMG 不会保留 Finder 自定义图标元数据，安装内容相同。另一个 `-arm64.zip` 包含应用本体。
+
+![1.2.0（43）DMG 实际窗口](docs/assets/installer-1.2.0.png)
 
 如果 macOS 阻止打开，请先核对下载来源、签名和发布说明。仅在确认信任文件时，按 [Apple 官方说明](https://support.apple.com/guide/mac-help/mh40616/mac)在“系统设置 → 隐私与安全性”中处理。**签名不等于已公证**，不要为了安装而关闭系统安全保护。
 
@@ -80,7 +86,7 @@ cd ByteKibble
 swift build -c release
 ```
 
-项目没有第三方运行时依赖。源码编译成功不代表得到签名、公证或验证过的安装包。当前文档先于应用代码更新，实际构建行为以检出的代码为准。
+项目没有第三方运行时依赖。运行 `swift test -j 2` 执行测试；`bash scripts/package-local.sh release` 生成本机架构的 ad-hoc 签名应用，输出在 `output/acceptance/`。打包脚本需要带 `actool` 的 Xcode。源码构建不会自动使用发行者的 Developer ID，也不会自动公证。DMG 打包方法见 [发布记录](CHANGELOG.md)。
 
 ## 反馈与许可
 
@@ -92,4 +98,4 @@ swift build -c release
 
 复用新许可覆盖的代码时，须保留版权与许可文本，并注明「字节猫粮（ByteKibble）— Mustundead / MU Labs」、个人主页和[项目地址](https://github.com/mustundead/ByteKibble)。具体范围和署名位置见 [LICENSE](LICENSE)。商业授权请通过[个人主页](https://mustundead.com)联系；申请不等于获准。
 
-**不追溯旧授权。** 此前按 MIT 提供的代码和版本（包括 1.2.0（41）验收包）继续适用[原 MIT 许可](LICENSES/MIT-legacy.txt)，原有商用权限不受影响。本次只更新许可与说明，不上传新应用代码或安装包。
+**不追溯旧授权。** 此前按 MIT 提供的代码和版本（包括 1.2.0（41）验收包）继续适用[原 MIT 许可](LICENSES/MIT-legacy.txt)，原有商用权限不受影响。新发布内容的适用范围以 [LICENSE](LICENSE) 为准。

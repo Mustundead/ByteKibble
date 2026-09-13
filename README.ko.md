@@ -9,7 +9,7 @@
 
 ByteKibble은 macOS 메뉴 막대에서 구독 데이터 사용량을 확인하는 네이티브 앱입니다. Clash 계열 클라이언트와 SNTP 사용자가 궁금해하는 **“이 구독으로 데이터를 얼마나 더 쓸 수 있을까?”**에 답합니다. 클라이언트나 제공업체 웹사이트를 매번 열지 않고 사용량, 만료일, 데이터 출처를 확인할 수 있습니다.
 
-> **현재는 문서와 아이콘만 업데이트했습니다.** 이 페이지는 다듬고 있는 새 버전을 소개합니다. 해당 앱 코드, 첫 실행 환영 화면, ZIP/DMG 패키지는 이번 업데이트에 포함되지 않았습니다. 기존 코드와 `preview/`의 과거 스크린샷은 이 페이지의 새 디자인과 다릅니다. 다운로드는 [Releases](https://github.com/mustundead/ByteKibble/releases)에 실제로 게시된 버전을 기준으로 확인하세요.
+> **1.2.0 (43) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0). `preview/`의 이미지는 과거 버전입니다.
 
 ## 주요 기능
 
@@ -56,7 +56,13 @@ ByteKibble이 모든 네트워크 트래픽을 직접 측정하는 것은 아닙
 
 **macOS 13 이상**이 필요합니다. 네이티브 Liquid Glass 스타일은 macOS 26 이상에서 사용하며 이전 시스템에서는 호환 스타일을 사용합니다. 프로세서 지원, 서명, 공증 여부는 각 패키지의 릴리스 설명을 확인하세요.
 
-드래그로 설치하는 ZIP/DMG와 한 페이지 환영 화면은 준비 중입니다. **이번 문서 업데이트에는 새 설치 파일이 포함되지 않습니다.** 게시 후 이 저장소의 [Releases](https://github.com/mustundead/ByteKibble/releases)에서 받을 수 있습니다. ZIP은 압축을 풀고 앱을 “응용 프로그램”으로 옮기고, DMG는 열어서 앱을 “응용 프로그램” 바로가기로 드래그합니다. 이동한 앱을 “응용 프로그램”에서 실행하세요.
+[1.2.0 (43) 릴리스 페이지](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0)에서 DMG 또는 ZIP을 받으세요. 이전 버전을 종료한 뒤 DMG의 ByteKibble을 Applications로 드래그하거나 ZIP을 풀어 앱을 “응용 프로그램”으로 옮기세요. 디스크 안의 복사본이 아닌 “응용 프로그램”에서 실행하세요. 처음 사용할 때 환영 화면이 표시됩니다.
+
+배포 바이너리는 **Apple silicon (arm64) 전용**이며 Intel 버전은 포함하지 않습니다. 로컬 빌드, 테스트 및 화면 확인은 macOS 27에서 수행했습니다. 최소 배포 대상은 macOS 13이지만 모든 이전 OS에서 실기기 검증을 완료했다는 의미는 아닙니다.
+
+App 아이콘과 오른쪽 아래 열린 상자 배지를 유지하려면 `-installer.zip`을 풀어 DMG를 꺼내세요. DMG를 HTTP로 직접 다운로드하면 사용자 지정 아이콘 메타데이터는 유지되지 않지만 설치 내용은 같습니다. 별도의 `-arm64.zip`에는 앱 자체가 들어 있습니다.
+
+![1.2.0 (43)의 실제 DMG 창](docs/assets/installer-1.2.0.png)
 
 macOS가 실행을 차단하면 먼저 다운로드 출처, 서명, 릴리스 설명을 확인하세요. 파일을 신뢰할 수 있는 경우에만 [Apple의 안내](https://support.apple.com/guide/mac-help/mh40616/mac)에 따라 “시스템 설정 → 개인정보 보호 및 보안”에서 처리하세요. **서명과 공증은 다릅니다.** 설치를 위해 시스템 보안 기능을 끄지 마세요.
 
@@ -80,7 +86,7 @@ cd ByteKibble
 swift build -c release
 ```
 
-서드 파티 런타임 의존성은 없습니다. 빌드 성공이 서명, 공증 또는 설치 파일 검증 완료를 뜻하지는 않습니다. 문서를 앱 코드보다 먼저 업데이트했으므로 실제 빌드 동작은 체크아웃한 코드에 따릅니다.
+서드 파티 런타임 의존성은 없습니다. `swift test -j 2`로 테스트하세요. `bash scripts/package-local.sh release`는 호스트 아키텍처의 ad-hoc 서명 앱을 `output/acceptance/`에 생성하며, `actool`이 포함된 Xcode가 필요합니다. 소스 빌드는 배포자의 Developer ID 서명이나 공증을 자동으로 수행하지 않습니다. DMG 생성 방법은 [CHANGELOG](CHANGELOG.md)를 확인하세요.
 
 ## 피드백과 라이선스
 
@@ -92,4 +98,4 @@ swift build -c release
 
 새 라이선스가 적용되는 코드를 재사용할 때는 저작권 및 라이선스 고지를 유지하고 “ByteKibble — Mustundead / MU Labs”, 개인 홈페이지와 [저장소](https://github.com/mustundead/ByteKibble)를 표기해야 합니다. 적용 범위와 표기 위치는 [LICENSE](LICENSE)를 확인하세요. 상업적 이용 승인은 [개인 홈페이지](https://mustundead.com)를 통해 요청해 주세요. 요청만으로 허가가 주어지는 것은 아닙니다.
 
-**기존 허가는 유지됩니다.** 이전에 MIT로 제공한 코드와 버전(1.2.0 (41) 검수용 패키지 포함)에는 상업적 사용 권리를 포함한 [기존 MIT 조건](LICENSES/MIT-legacy.txt)이 계속 적용됩니다. 이번에는 라이선스 문서와 README만 업데이트하며 새 앱 코드나 설치 파일은 업로드하지 않습니다.
+**기존 허가는 유지됩니다.** 이전에 MIT로 제공한 코드와 버전(1.2.0 (41) 검수용 패키지 포함)에는 상업적 사용 권리를 포함한 [기존 MIT 조건](LICENSES/MIT-legacy.txt)이 계속 적용됩니다. 새로 배포하는 자료의 적용 범위는 [LICENSE](LICENSE)를 확인하세요.

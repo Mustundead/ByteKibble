@@ -4,165 +4,170 @@ import SwiftUI
 
 @MainActor
 final class ViewModel: ObservableObject {
-    /// 预览渲染模式：不扫描真实数据、不触发刷新
-    var isPreview = false
+    var isPreview: Bool
     @Published var targets: [SubTarget] = []
-    /// 各订阅最新样本（实时查询结果会覆盖缓存）
     @Published var samples: [String: QuotaSample] = [:]
     @Published var selectedID: String {
-        didSet { UserDefaults.standard.set(selectedID, forKey: "selectedTargetID") }
+        didSet {
+            guard !isPreview, oldValue != selectedID else { return }
+            defaults.set(selectedID, forKey: "selectedTargetID")
+            if automaticRefresh { Task { await refreshLive() } }
+        }
     }
-    @Published var fetching = false
-    @Published var statusLine: String?
+    @Published private(set) var loading: Set<String> = []
+    @Published private(set) var failures: [String: String] = [:]
     @Published var now = Date()
-
+    @Published private(set) var removedTarget: SubTarget?
+    @Published private(set) var notice: String?
     private var timer: AnyCancellable?
     private var tickCount = 0
-    private var lastLiveFetch: Date?
-    private var lastFetchFailed = false
-    /// 定时器 30 秒一跳：每 2 跳（1 分钟）重试失败的拉取，每 30 跳（15 分钟）定时实时刷新，每 60 跳（30 分钟）重扫本地客户端
-    private let retryEvery = 2
-    private let liveEvery = 30
-    private let rescanEvery = 60
-    private var activity: NSObjectProtocol?
+    private var requestIDs: [String: UUID] = [:]
+    private let defaults: UserDefaults
+    private let scan: () -> [SubTarget]
+    private let fetch: (String) async throws -> QuotaSample
+    private let automaticRefresh: Bool
 
-    init(preview: Bool = false) {
-        isPreview = preview
-        selectedID = UserDefaults.standard.string(forKey: "selectedTargetID") ?? ""
+    init(preview: Bool = false, defaults: UserDefaults = .standard,
+         scan: @escaping () -> [SubTarget] = { Providers.scanAll() },
+         automaticRefresh: Bool = true,
+         fetch: @escaping (String) async throws -> QuotaSample = Fetcher.fetch) {
+        self.isPreview = preview
+        self.defaults = defaults
+        self.scan = scan
+        self.fetch = fetch
+        self.automaticRefresh = automaticRefresh
+        selectedID = preview ? "" : defaults.string(forKey: "selectedTargetID") ?? ""
+        guard !preview else { return }
         rescan()
-        if !preview {
-            // 菜单栏应用无可见窗口时会被 macOS App Nap 休眠，定时器停摆导致数据不及时，这里显式保持活跃
-            activity = ProcessInfo.processInfo.beginActivity(
-                options: [.userInitiatedAllowingIdleSystemSleep],
-                reason: "ByteKibble 定时刷新流量数据")
-            Task { await refreshLive() }
-            timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
-                .sink { [weak self] t in
-                    guard let self else { return }
-                    self.now = t
-                    self.tickCount += 1
-                    if self.tickCount % self.rescanEvery == 0 { self.rescan() }
-                    let scheduled = self.tickCount % self.liveEvery == 0
-                    let retry = self.lastFetchFailed && self.tickCount % self.retryEvery == 0
-                    if scheduled || retry { Task { await self.refreshLive() } }
+        guard automaticRefresh else { return }
+        Task { await refreshLive() }
+        timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+            .sink { [weak self] date in
+                guard let self else { return }
+                self.now = date
+                self.tickCount += 1
+                if self.tickCount % 60 == 0 { self.rescan() }
+                if self.tickCount % 30 == 0 || (self.statusLine != nil && self.tickCount % 2 == 0) {
+                    Task { await self.refreshLive() }
                 }
-        }
+            }
     }
 
-    deinit {
-        if let activity {
-            ProcessInfo.processInfo.endActivity(activity)
-        }
+    var selected: SubTarget? { targets.first { $0.id == selectedID } ?? targets.first }
+    var fetching: Bool { selected.map { loading.contains($0.id) } ?? false }
+    var statusLine: String? { selected.flatMap { failures[$0.id] } }
+
+    func sample(for target: SubTarget) -> QuotaSample? {
+        // Reading a cache again does not make it a newer measurement.
+        samples[target.id] ?? target.cached
     }
 
-    var selected: SubTarget? {
-        targets.first { $0.id == selectedID } ?? targets.first
-    }
-
-    func sample(for t: SubTarget) -> QuotaSample? {
-        let a = t.cached
-        let b = samples[t.id]
-        switch (a, b) {
-        case (nil, nil): return nil
-        case (nil, .some(let x)): return x
-        case (.some(let x), nil): return x
-        case (.some(let x), .some(let y)): return x.fetchedAt <= y.fetchedAt ? y : x
-        }
-    }
-
-    /// 菜单栏：剩余流量数值
     var menubarValueText: String {
-        guard let t = selected, let s = sample(for: t) else { return L10n.noSubscription }
+        guard let t = selected else { return L10n.noSubscription }
+        guard let s = sample(for: t) else { return L10n.t("待查询") }
         return Fmt.bytes(s.remaining)
     }
-
-    /// 菜单栏：饼状进度环的已用比例
     var menubarUsedRatio: Double {
-        guard let t = selected, let s = sample(for: t), s.total > 0 else { return 0 }
-        return Double(s.used) / Double(s.total)
+        guard let t = selected, let s = sample(for: t) else { return 0 }
+        return s.usedRatio
     }
-
-    /// 菜单栏：重置倒计时（无重置数据的订阅源返回 nil，标签里零宽隐藏）
+    // Client-reported reset days; display follows the original midnight convention.
     var menubarDaysText: String? {
-        guard let t = selected, let s = sample(for: t), let rd = s.resetDay else { return nil }
-        return countdownText(days: rd, now: now)
+        guard let target = selected, let sample = sample(for: target), let days = sample.resetDay else { return nil }
+        return countdownText(days: days, now: now)
     }
 
-    /// 倒计时显示规则：天 > 小时 > 分钟。
-    /// reset_day 是「距重置的天数」（按日历日差），重置时刻按重置日的零点计算；
-    /// 剩余超过 24h 用向上取整的天数（与官方客户端口径一致），不足 1 天显示小时，不足 1 小时显示分钟。
-    /// 重置磁贴副标题：整句本地化（天/小时/分钟各自整句，不做跨语言拼接）
-    func resetSubText(days: Int, now: Date) -> String {
-        let target = Calendar.current.startOfDay(for: now).addingTimeInterval(TimeInterval(days) * 86400)
-        let d = target.timeIntervalSince(now)
-        if d <= 0 { return L10n.resetToday }
-        if d > 86400 { return L10n.inDays(Int(ceil(d / 86400))) }
-        if d > 3600 { return L10n.inHours(Int(d / 3600)) }
-        return L10n.inMinutes(max(1, Int(d / 60)))
-    }
-
+    // Restored at the user's request: original client-day countdown presentation.
     func countdownText(days: Int, now: Date) -> String {
         let target = Calendar.current.startOfDay(for: now).addingTimeInterval(TimeInterval(days) * 86400)
-        let d = target.timeIntervalSince(now)
-        if d <= 0 { return L10n.today }
-        if d > 86400 { return L10n.cdDays(Int(ceil(d / 86400))) }
-        if d > 3600 { return L10n.cdHours(Int(d / 3600)) }
-        return L10n.cdMinutes(max(1, Int(d / 60)))
+        let remaining = target.timeIntervalSince(now)
+        if remaining <= 0 { return L10n.today }
+        if remaining > 86400 { return L10n.cdDays(Int(ceil(remaining / 86400))) }
+        if remaining > 3600 { return L10n.cdHours(Int(remaining / 3600)) }
+        return L10n.cdMinutes(max(1, Int(remaining / 60)))
     }
-
-    /// 菜单栏/面板预警等级
     var warningLevel: WarningLevel {
         guard let t = selected, let s = sample(for: t), s.total > 0 else { return .normal }
         return WarningLevel.level(remainingRatio: Double(s.remaining) / Double(s.total))
     }
-
+    var accessibilitySummary: String {
+        guard let t = selected, let s = sample(for: t) else { return menubarValueText }
+        return "\(t.name), \(L10n.remainingTraffic) \(Fmt.bytes(s.remaining)), \(freshness(s))"
+    }
+    func freshness(_ sample: QuotaSample) -> String {
+        guard let date = sample.fetchedAt else { return L10n.t("客户端缓存 · 更新时间未知") }
+        if abs(now.timeIntervalSince(date)) < 60 { return L10n.t("刚刚更新") }
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = L10n.locale
+        formatter.unitsStyle = .full
+        return L10n.f("更新于 %@", formatter.localizedString(for: date, relativeTo: now))
+    }
     func menuOpened() {
         guard !isPreview else { return }
+        now = Date()
         rescan()
         Task { await refreshLive() }
     }
-
     func rescan() {
         guard !isPreview else { return }
-        targets = Providers.scanAll()
+        targets = scan()
         if !targets.contains(where: { $0.id == selectedID }) {
-            selectedID = targets.first(where: { $0.cached != nil })?.id ?? targets.first?.id ?? ""
+            selectedID = targets.first?.id ?? ""
         }
     }
-
     func refreshLive() async {
-        guard !fetching, let t = selected else { return }
-        fetching = true
-        statusLine = nil
-        defer { fetching = false }
+        guard let t = selected, !loading.contains(t.id) else { return }
+        let requestID = UUID()
+        requestIDs[t.id] = requestID
+        loading.insert(t.id)
+        failures[t.id] = nil
+        defer {
+            if requestIDs[t.id] == requestID { loading.remove(t.id) }
+        }
         do {
-            var s = try await Fetcher.fetch(url: t.url)
-            // 实时头里没有的字段（套餐名、重置日）用客户端缓存补齐
-            if let c = t.cached {
-                if s.planName == nil { s.planName = c.planName }
-                if s.resetDay == nil { s.resetDay = c.resetDay }
-            }
-            samples[t.id] = s
-            lastLiveFetch = Date()
-            lastFetchFailed = false
+            var sample = try await fetch(t.url)
+            guard requestIDs[t.id] == requestID, targets.contains(where: { $0.id == t.id }) else { return }
+            sample.planName = sample.planName ?? t.cached?.planName
+            sample.resetDay = sample.resetDay ?? t.cached?.resetDay
+            samples[t.id] = sample
+            now = Date()
         } catch {
-            lastFetchFailed = true
-            statusLine = "实时查询失败，当前显示缓存数据"
+            guard requestIDs[t.id] == requestID, targets.contains(where: { $0.id == t.id }) else { return }
+            failures[t.id] = (error as? Fetcher.Failure)?.message ?? L10n.t("无法连接。请检查网络和代理客户端后重试。")
         }
     }
-
-    func addCustom(url: String) {
-        Providers.addCustom(url: url.trimmingCharacters(in: .whitespacesAndNewlines))
+    @discardableResult
+    func addCustom(url: String) -> Bool {
+        guard !isPreview else { return false }
+        let text = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard Providers.validatedURL(text) != nil else { return false }
+        if let existing = targets.first(where: { Providers.dedupeKey($0.url) == Providers.dedupeKey(text) }) {
+            selectedID = existing.id
+            notice = L10n.t("已选择已有订阅。")
+            if automaticRefresh { Task { await refreshLive() } }
+            return true
+        }
+        notice = nil
+        Providers.addCustom(url: text, defaults: defaults)
         rescan()
-        if let t = targets.last(where: { $0.origin == "手动添加" }) {
-            selectedID = t.id
-        }
-        Task { await refreshLive() }
+        selectedID = targets.first(where: { $0.url == text })?.id ?? selectedID
+        if automaticRefresh { Task { await refreshLive() } }
+        return true
     }
-
     func removeCustom(id: String) {
-        Providers.removeCustom(url: id)
-        if selectedID == id { selectedID = "" }
+        guard !isPreview else { return }
+        guard let target = targets.first(where: { $0.id == id && $0.origin == "custom" }) else { return }
+        removedTarget = target
+        requestIDs[id] = nil
+        loading.remove(id)
+        failures[id] = nil
+        notice = nil
+        Providers.removeCustom(url: target.url, defaults: defaults)
         rescan()
+    }
+    func undoRemoval() {
+        guard let target = removedTarget else { return }
+        removedTarget = nil
+        _ = addCustom(url: target.url)
     }
 }

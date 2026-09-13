@@ -1,6 +1,8 @@
 .build/
 .build-arm/
 .build-x64/
+.build-audit/
+output/
 dist/
 .DS_Store
 *.dSYM

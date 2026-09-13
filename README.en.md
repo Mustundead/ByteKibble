@@ -9,7 +9,7 @@
 
 ByteKibble is a native macOS menu bar utility for subscription traffic allowances. For users of Clash-family clients and SNTP, it answers one simple question: **how much data is left on this subscription?** Check usage, expiry and data sources without repeatedly opening a client or provider website.
 
-> **Status: documentation and icon update only.** This page describes the version being refined. The matching app code, first-launch welcome page and ZIP/DMG packages have not been published with this update. Older code and screenshots in `preview/` do not represent the new design described here. Downloads depend on the versions actually published in [Releases](https://github.com/mustundead/ByteKibble/releases).
+> **1.2.0 (43) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0). Images in `preview/` are historical.
 
 ## What it shows
 
@@ -56,7 +56,13 @@ ByteKibble does not measure all network activity itself. Readings depend on the 
 
 Requires **macOS 13 or later**. Native Liquid Glass styling requires macOS 26 or later; older systems use compatible styling. Check each package's release notes for processor support, signing and notarization.
 
-Drag-install ZIP/DMG packages and a one-page welcome screen are being prepared. **No new installer accompanies this documentation update.** Once published, get packages from this repository's [Releases](https://github.com/mustundead/ByteKibble/releases). Unzip a ZIP and move the app to Applications, or open a DMG and drag the app onto its Applications shortcut. Launch the installed copy from Applications.
+Download the DMG or ZIP from the [1.2.0 (43) release](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0). Quit the older copy first. Open the DMG and drag ByteKibble to Applications, or unzip the ZIP and move the app there. Launch from Applications rather than the mounted disk. A welcome screen appears on first use.
+
+This binary is **Apple silicon (arm64) only**; no Intel package is included. Local builds, tests and UI checks were performed on macOS 27. The deployment target is macOS 13; this does not establish runtime verification on every older system.
+
+Choose `-installer.zip` to preserve the app-primary Finder icon and open-box badge on its extracted DMG. Direct HTTP downloads of the bare DMG do not preserve custom-icon metadata; installation contents are identical. The separate `-arm64.zip` contains the app itself.
+
+![Actual 1.2.0 (43) DMG window](docs/assets/installer-1.2.0.png)
 
 If macOS blocks the app, verify the source, signature and release notes first. Only if you trust the file, follow [Apple's instructions](https://support.apple.com/guide/mac-help/mh40616/mac) in System Settings → Privacy & Security. **Signing is not notarization.** Do not disable system security protections to install it.
 
@@ -80,7 +86,7 @@ cd ByteKibble
 swift build -c release
 ```
 
-There are no third-party runtime dependencies. A successful source build does not establish signing, notarization or installer validation. This documentation is ahead of the app-code update; the checked-out source determines actual build behavior.
+There are no third-party runtime dependencies. Run `swift test -j 2` for tests. `bash scripts/package-local.sh release` creates an ad-hoc signed app for the host architecture under `output/acceptance/`; packaging requires Xcode with `actool`. Building from source does not use the publisher's Developer ID or automatically notarize the app. See [CHANGELOG](CHANGELOG.md) for DMG packaging.
 
 ## Feedback and license
 
@@ -92,4 +98,4 @@ Personal website: [mustundead.com](https://mustundead.com). Made by Mustundead's
 
 When reusing code covered by the new license, retain copyright and license notices and credit “ByteKibble — Mustundead / MU Labs”, the personal website and [this repository](https://github.com/mustundead/ByteKibble). See [LICENSE](LICENSE) for scope and attribution placement. Request commercial authorization through [the personal website](https://mustundead.com); a request is not permission.
 
-**Existing permissions are preserved.** Code and versions previously provided under MIT, including the 1.2.0 (41) acceptance package, retain the [legacy MIT terms](LICENSES/MIT-legacy.txt), including commercial-use rights. This update changes only licensing documents and READMEs; it does not upload new app code or installers.
+**Existing permissions are preserved.** Code and versions previously provided under MIT, including the 1.2.0 (41) acceptance package, retain the [legacy MIT terms](LICENSES/MIT-legacy.txt), including commercial-use rights. See [LICENSE](LICENSE) for the scope of the terms covering newly distributed material.

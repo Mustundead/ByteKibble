@@ -1,0 +1,20 @@
+字节猫粮 · ByteKibble
+
+安装 / Install
+将 ByteKibble 拖到 Applications（应用程序），然后从“应用程序”打开。
+Drag ByteKibble onto Applications, then launch it from Applications.
+替换旧版本前请先退出应用。订阅和偏好设置会保留。
+Quit the previous version before replacing it. Your subscriptions and preferences are retained.
+安装后可推出磁盘映像。菜单栏图标用于打开流量面板。
+Eject this disk after installation. Open the traffic panel from the menu bar icon.
+
+本地验收版本 / Local acceptance candidate
+Apple silicon (arm64). macOS 13 or later.
+Developer ID signed. Not notarized; not a verified public release.
+已使用 Developer ID 签名，尚未公证，不代表正式发布版本。
+macOS 安全提示说明 / macOS security help:
+https://support.apple.com/guide/mac-help/mh40616/mac
+
+Mustundead · MU Labs
+https://mustundead.com
+https://github.com/mustundead/ByteKibble

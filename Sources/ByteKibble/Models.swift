@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import AppKit
 
 struct QuotaSample: Equatable {
     enum Source: String {
@@ -15,10 +16,14 @@ struct QuotaSample: Equatable {
     var expireAt: Date?
     var resetDay: Int?
     var planName: String?
-    var fetchedAt: Date
+    /// nil means the client did not supply a trustworthy update time.
+    var fetchedAt: Date?
     var source: Source
 
-    var used: Int64 { uploaded + downloaded }
+    var used: Int64 {
+        let sum = uploaded.addingReportingOverflow(downloaded)
+        return sum.overflow ? Int64.max : sum.partialValue
+    }
     var remaining: Int64 { max(total - used, 0) }
     var usedRatio: Double { total > 0 ? Double(used) / Double(total) : 0 }
 }
@@ -48,8 +53,16 @@ enum WarningLevel {
     var color: Color {
         switch self {
         case .normal: return .primary
-        case .warn: return .orange
-        case .danger: return .red
+        case .warn:
+            return Color(nsColor: NSColor(name: nil) { appearance in
+                appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+                    ? .systemOrange : NSColor(srgbRed: 0.62, green: 0.31, blue: 0, alpha: 1)
+            })
+        case .danger:
+            return Color(nsColor: NSColor(name: nil) { appearance in
+                appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+                    ? .systemRed : NSColor(srgbRed: 0.78, green: 0.12, blue: 0.14, alpha: 1)
+            })
         }
     }
 }

@@ -12,34 +12,6 @@ BUILD_NUM=$(cat .buildnumber 2>/dev/null || /usr/libexec/PlistBuddy -c "Print :C
 BUILD_NUM=$((BUILD_NUM + 1))
 echo "$BUILD_NUM" > .buildnumber
 
-echo "==> 生成图标"
-mkdir -p Resources/icon.iconset
-# 图标源：Resources/AppIcon.icon（Icon Composer）内嵌的浅色图 + 品牌SVG，不再手绘
-rm -rf Resources/icon.iconset && mkdir -p Resources/icon.iconset
-python3 - <<'PYEOF'
-import subprocess, os
-src = "Resources/icon_light_1024.png"
-sizes = [(16,16,"icon_16x16.png"), (32,32,"icon_16x16@2x.png"), (32,32,"icon_32x32.png"),
-         (64,64,"icon_32x32@2x.png"), (128,128,"icon_128x128.png"), (256,256,"icon_128x128@2x.png"),
-         (256,256,"icon_256x256.png"), (512,512,"icon_256x256@2x.png"), (512,512,"icon_512x512.png"),
-         (1024,1024,"icon_512x512@2x.png")]
-for h, w, name in sizes:
-    subprocess.run(["sips", "-z", str(h), str(w), src, "--out", os.path.join("Resources/icon.iconset", name)], capture_output=True)
-PYEOF
-iconutil -c icns Resources/icon.iconset -o Resources/AppIcon.icns
-if [ -f Resources/icon.iconset/icon_1024.png ]; then
-    sips -z 16 16     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16.png     >/dev/null
-    sips -z 32 32     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_16x16@2x.png  >/dev/null
-    sips -z 32 32     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_32x32.png     >/dev/null
-    sips -z 64 64     Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_32x32@2x.png  >/dev/null
-    sips -z 128 128   Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_128x128.png   >/dev/null
-    sips -z 256 256   Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_128x128@2x.png >/dev/null
-    sips -z 256 256   Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_256x256.png   >/dev/null
-    sips -z 512 512   Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_256x256@2x.png >/dev/null
-    sips -z 512 512   Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_512x512.png   >/dev/null
-    sips -z 1024 1024 Resources/icon.iconset/icon_1024.png --out Resources/icon.iconset/icon_512x512@2x.png >/dev/null
-    iconutil -c icns Resources/icon.iconset -o Resources/AppIcon.icns && echo "AppIcon.icns 已生成"
-fi
 
 echo "==> 构建二进制 (arm64)"
 swift build -c release --scratch-path .build-arm
@@ -80,17 +52,16 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
-    <key>CFBundleIconFile</key><string>AppIcon</string>
-    <key>ASACatalogAssets</key><string>AppIcon</string>
+    <key>CFBundleIconFile</key><string>ByteKibble</string>
+    <key>CFBundleIconName</key><string>ByteKibble</string>
     <key>NSHumanReadableCopyright</key><string>ByteKibble — Traffic monitor designed for Clash, Mihomo, SNTP</string>
 </dict>
 </plist>
 PLIST
 echo -n "APPL????" > "$APP/Contents/PkgInfo"
 
-[ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/"
-# macOS 26 Icon Composer 图标（Liquid Glass + 明暗切换）
-[ -d Resources/AppIcon.icon ] && cp -R Resources/AppIcon.icon "$APP/Contents/Resources/"
+# Compile real appearance/material resources instead of copying an uncompiled .icon.
+bash scripts/compile-icon.sh "$APP/Contents/Resources"
 
 # SPM 资源包（Bundle.module 依赖，缺了会启动即崩）
 RES_BUNDLE=".build-arm/out/Products/Release/${APP_NAME}_${APP_NAME}.bundle"

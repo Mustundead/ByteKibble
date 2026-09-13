@@ -2,16 +2,32 @@ import SwiftUI
 import ServiceManagement
 import AppKit
 
+#if BYTEKIBBLE_ACCEPTANCE
 @main
-struct ByteKibbleApp: App {
-    @StateObject private var vm: ViewModel
-
-    init() {
+struct ByteKibbleAcceptanceApp: App {
+    var body: some Scene {
+        WindowGroup("ByteKibble · Acceptance") { AcceptanceHarness() }
+            .windowResizability(.contentSize)
+    }
+}
+#else
+@main
+struct ByteKibbleEntry {
+    @MainActor static func main() { ByteKibbleApp.main() }
+}
+#endif
+@MainActor
+struct ByteKibbleApp {
+    static func main() {
         if let out = Self.previewOutputDir {
             Self.renderPreviews(to: out)
-            exit(0)
+            return
         }
-        _vm = StateObject(wrappedValue: ViewModel())
+        let application = NSApplication.shared
+        application.setActivationPolicy(.accessory)
+        let delegate = AppDelegate()
+        application.delegate = delegate
+        withExtendedLifetime(delegate) { application.run() }
     }
 
     /// `--render-preview <目录>`：用模拟数据渲染 Clash 客户端场景的面板/菜单栏 PNG 后退出
@@ -21,14 +37,6 @@ struct ByteKibbleApp: App {
         return CommandLine.arguments[i + 1]
     }
 
-    var body: some Scene {
-        MenuBarExtra {
-            MenuView(vm: vm)
-        } label: {
-            MenubarLabel(vm: vm)
-        }
-        .menuBarExtraStyle(.window)
-    }
 }
 
 /// 菜单栏标签：整块内容（饼环 + 数值 + ⟳ 倒计时）预渲染为一张位图。
@@ -41,6 +49,8 @@ struct MenubarLabel: View {
         if let img = MenubarImageRenderer.image(for: vm) {
             Image(nsImage: img)
                 .interpolation(.high)
+                .accessibilityLabel("ByteKibble")
+                .accessibilityValue(vm.accessibilitySummary)
         } else {
             Text(vm.menubarValueText)
                 .font(.system(size: 13, weight: .semibold))
@@ -54,13 +64,14 @@ enum MenubarImageRenderer {
 
     static func image(for vm: ViewModel) -> NSImage? {
         let dark = NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let ratio = Int(vm.menubarUsedRatio * 100)
+        let hasQuota = vm.selected.flatMap { vm.sample(for: $0) }.map { $0.total > 0 } ?? false
+        let ratio = Int((hasQuota ? vm.menubarUsedRatio : 1) * 100)
         let days = vm.menubarDaysText
         let level = vm.warningLevel
         let key = "\(vm.menubarValueText)|\(days ?? "-")|\(level)|\(dark)|\(ratio)"
         if let hit = cache[key] { return hit }
         guard let img = draw(value: vm.menubarValueText, days: days,
-                             ratio: vm.menubarUsedRatio, level: level, dark: dark) else { return nil }
+                             ratio: hasQuota ? vm.menubarUsedRatio : 1, level: level, dark: dark) else { return nil }
         if cache.count > 12 { cache.removeAll() }
         cache[key] = img
         return img
@@ -87,16 +98,18 @@ enum MenubarImageRenderer {
 
         let pie: CGFloat = 17
         let pieGap: CGFloat = 4.5
-        let tailGap: CGFloat = 4
+        let tailGap: CGFloat = 5
+        let resetSymbol = tintedSymbol("arrow.clockwise", neutral, point: 15)
         var width = pie + pieGap + ceil(valueSize.width)
         var dotSize = NSSize.zero, symSize = NSSize.zero, daysSize = NSSize.zero
-        var symbolImg: NSImage?
         if days != nil {
-            dotSize = ("·" as NSString).size(withAttributes: [.font: tailFont])
-            // 手绘 ⟳：弧线粗细与菜单栏饼环一致（3pt）
-            symSize = NSSize(width: 15, height: 15)
+            dotSize = NSSize(width: 2, height: 2)
+            if let resetSymbol {
+                let fit = (pie - 2) / max(resetSymbol.size.width, resetSymbol.size.height)
+                symSize = NSSize(width: resetSymbol.size.width * fit, height: resetSymbol.size.height * fit)
+            }
             daysSize = (days! as NSString).size(withAttributes: [.font: tailFont])
-            width += tailGap + ceil(dotSize.width) + 2 + symSize.width + 3 + ceil(daysSize.width)
+            width += tailGap * 2 + dotSize.width + symSize.width + 3 + ceil(daysSize.width)
         }
 
         let scale: CGFloat = 3
@@ -111,22 +124,25 @@ enum MenubarImageRenderer {
         let ctx = NSGraphicsContext(bitmapImageRep: rep)
         NSGraphicsContext.current = ctx
 
-        // 饼环：轨道 + 已用比例弧（圆头）
-        let r = (pie - 3.2) / 2
+        // Filled pie: bright sector is remaining traffic, not used traffic.
+        let r = (pie - 2) / 2
         let center = NSPoint(x: pie / 2, y: h / 2)
-        let lineWidth: CGFloat = 3
         let track = NSBezierPath(ovalIn: NSRect(x: center.x - r, y: center.y - r, width: r * 2, height: r * 2))
-        track.lineWidth = lineWidth
-        main.withAlphaComponent(0.22).setStroke()
-        track.stroke()
+        main.withAlphaComponent(0.22).setFill()
+        track.fill()
         let arc = NSBezierPath()
-        let used = min(max(ratio, 0.04), 1)
-        arc.appendArc(withCenter: center, radius: r, startAngle: 90,
-                      endAngle: 90 - 360 * used, clockwise: true)
-        arc.lineWidth = lineWidth
-        arc.lineCapStyle = .round
-        main.setStroke()
-        arc.stroke()
+        let remaining = 1 - min(max(ratio, 0), 1)
+        if remaining >= 1 {
+            main.setFill()
+            track.fill()
+        } else if remaining > 0 {
+            arc.move(to: center)
+            arc.appendArc(withCenter: center, radius: r, startAngle: 90,
+                          endAngle: 90 - 360 * remaining, clockwise: true)
+            arc.close()
+            main.setFill()
+            arc.fill()
+        }
 
         // 数值
         var x = pie + pieGap
@@ -137,11 +153,11 @@ enum MenubarImageRenderer {
         // 倒计时：· ⟳ N天
         if let days {
             x += tailGap
-            ("·" as NSString).draw(at: NSPoint(x: x, y: (h - dotSize.height) / 2),
-                                   withAttributes: [.font: tailFont, .foregroundColor: neutral])
-            x += ceil(dotSize.width) + 2
-            let arrow = resetArrow(size: 15, color: neutral, lineWidth: 3)
-            arrow.draw(in: NSRect(x: x, y: (h - symSize.height) / 2,
+            neutral.setFill()
+            NSBezierPath(ovalIn: NSRect(x: x, y: (h - dotSize.height) / 2,
+                                       width: dotSize.width, height: dotSize.height)).fill()
+            x += dotSize.width + tailGap
+            resetSymbol?.draw(in: NSRect(x: x, y: (h - symSize.height) / 2,
                                   width: symSize.width, height: symSize.height),
                        from: .zero, operation: .copy, fraction: 1)
             x += symSize.width + 3
@@ -152,43 +168,14 @@ enum MenubarImageRenderer {
         NSGraphicsContext.restoreGraphicsState()
         let out = NSImage(size: rep.size)
         out.addRepresentation(rep)
-        return out
-    }
-
-    /// 手绘重置箭头 ⟳：开口圆弧 + 切向三角箭头，线宽与菜单栏饼环一致
-    private static func resetArrow(size: CGFloat, color: NSColor, lineWidth: CGFloat) -> NSImage {
-        let out = NSImage(size: NSSize(width: size, height: size))
-        out.lockFocus()
-        let c = NSPoint(x: size / 2, y: size / 2)
-        let r = size / 2 - lineWidth / 2 - 0.5
-        let arc = NSBezierPath()
-        arc.appendArc(withCenter: c, radius: r, startAngle: 40, endAngle: 40 - 270, clockwise: true)
-        arc.lineWidth = lineWidth
-        arc.lineCapStyle = .round
-        color.setStroke()
-        arc.stroke()
-        // 箭头：弧终点处沿顺时针切线方向的小三角
-        let endAngle = (40.0 - 270.0) * .pi / 180
-        let end = NSPoint(x: c.x + r * cos(endAngle), y: c.y + r * sin(endAngle))
-        let t = NSPoint(x: sin(endAngle), y: -cos(endAngle))
-        let n = NSPoint(x: -t.y, y: t.x)
-        let tip = NSPoint(x: end.x + t.x * 5.5, y: end.y + t.y * 5.5)
-        let b1 = NSPoint(x: end.x + n.x * 3.0, y: end.y + n.y * 3.0)
-        let b2 = NSPoint(x: end.x - n.x * 3.0, y: end.y - n.y * 3.0)
-        let head = NSBezierPath()
-        head.move(to: tip)
-        head.line(to: b1)
-        head.line(to: b2)
-        head.close()
-        color.setFill()
-        head.fill()
-        out.unlockFocus()
+        // Let the menu-bar host choose contrast against its actual wallpaper/material.
+        out.isTemplate = level == .normal
         return out
     }
 
     private static func tintedSymbol(_ name: String, _ color: NSColor, point: CGFloat) -> NSImage? {
         guard let sym = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
-            .withSymbolConfiguration(.init(pointSize: point, weight: .medium)) else { return nil }
+            .withSymbolConfiguration(.init(pointSize: point, weight: .semibold)) else { return nil }
         let size = sym.size
         let out = NSImage(size: size)
         out.lockFocus()
@@ -266,12 +253,7 @@ extension ByteKibbleApp {
         print("[p] 面板3 OK")
 
         // 菜单栏标签：有重置日（SNTP）vs 无重置日（Clash），深色菜单栏底
-        let sntp = Providers.scanAll().first
-        print("[p] scanAll OK: \(sntp?.name ?? "无")")
         let strip = VStack(spacing: 10) {
-            if let s = sntp {
-                MenubarLabel(vm: mockVM(s, s.cached))
-            }
             MenubarLabel(vm: mockVM(verge, vergeSample))
         }
         .padding(.horizontal, 14)
@@ -389,8 +371,10 @@ extension View {
     /// 面板实色底：macOS 15+ 用系统窗口容器背景（四角按窗口形状精确裁切，无瑕疵）；
     /// 旧系统回退为手绘圆角矩形
     @ViewBuilder
-    func panelSolidBackground() -> some View {
-        if #available(macOS 15.0, *) {
+    func panelSolidBackground(nativePopover: Bool = false) -> some View {
+        if nativePopover {
+            self
+        } else if #available(macOS 15.0, *) {
             self.containerBackground(for: .window) {
                 Color(nsColor: .windowBackgroundColor)
             }
@@ -404,13 +388,19 @@ extension View {
 
     /// 数字变化时的滚动过渡（macOS 14+）
     @ViewBuilder
-    func numericTransition(value: some Equatable) -> some View {
-        if #available(macOS 14.0, *) {
-            self.contentTransition(.numericText())
-                .animation(.snappy(duration: 0.35), value: value)
-        } else {
-            self
-        }
+    func numericTransition(value: some Equatable, reduceMotionOverride: Bool? = nil) -> some View {
+        modifier(QuotaNumericTransition(value: value, reduceMotionOverride: reduceMotionOverride))
+    }
+}
+
+private struct QuotaNumericTransition<Value: Equatable>: ViewModifier {
+    let value: Value
+    var reduceMotionOverride: Bool?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func body(content: Content) -> some View {
+        if #available(macOS 14.0, *), !(reduceMotionOverride ?? reduceMotion) {
+            content.contentTransition(.numericText()).animation(.smooth(duration: 0.25), value: value)
+        } else { content }
     }
 }
 
@@ -447,20 +437,39 @@ enum EmojiIcon {
 
 struct MenuView: View {
     @ObservedObject var vm: ViewModel
+    var nativePopover = false
+    var allowsSystemChanges = true
+    var reduceMotionOverride: Bool?
+    var highContrastOverride: Bool?
+    var loginStatusOverride: SMAppService.Status?
+    var loginErrorOverride: String?
     @State private var customURL = ""
     @State private var showAdd = false
-    @State private var autostartOn = false
+    @State private var loginStatus = SMAppService.Status.notRegistered
+    @State private var loginError: String?
+    @FocusState private var urlFocused: Bool
+    @ScaledMetric(relativeTo: .largeTitle) private var quotaFontSize = 34.0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorSchemeContrast) private var contrast
+    private var displayedLoginStatus: SMAppService.Status { loginStatusOverride ?? loginStatus }
+
+    private func tr(_ value: String) -> String { L10n.t(value) }
 
     var body: some View {
         main.liquidContainer()
             .padding(16)
             .frame(width: 380)
-            .panelSolidBackground()
+            .panelSolidBackground(nativePopover: nativePopover)
             .onAppear {
-                vm.menuOpened()
-                if !vm.isPreview {
+                if !nativePopover { vm.menuOpened() }
+                if !vm.isPreview && allowsSystemChanges {
                     let st = SMAppService.mainApp.status
-                    autostartOn = (st == .enabled || st == .requiresApproval)
+                    loginStatus = st
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSPopover.willShowNotification)) { _ in
+                if nativePopover && !vm.isPreview && allowsSystemChanges {
+                    loginStatus = SMAppService.mainApp.status
                 }
             }
     }
@@ -497,7 +506,7 @@ struct MenuView: View {
                     if let sym = title.symbol {
                         Image(systemName: sym)
                             .font(.title3.weight(.bold))
-                            .foregroundStyle(vm.warningLevel.color)
+                            .foregroundStyle(.primary)
                     }
                     Text(title.text)
                         .font(.title3.bold())
@@ -511,14 +520,16 @@ struct MenuView: View {
             if let rd = s.resetDay {
                 HStack(spacing: 4) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 12, weight: .regular))
                     Text(vm.countdownText(days: rd, now: vm.now))
                         .font(.callout.weight(.bold))
                         .monospacedDigit()
+                        .lineLimit(1)
                 }
+                .fixedSize(horizontal: true, vertical: false)
                 .padding(.horizontal, 11)
                 .padding(.vertical, 6)
-                .foregroundStyle(vm.warningLevel.color)
+                .foregroundStyle(.primary)
                 .glassCard(in: Capsule())
             }
         }
@@ -529,48 +540,75 @@ struct MenuView: View {
 
     // MARK: 主卡片：剩余流量大数字 + 渐变进度条
 
-    private func heroCard(_ s: QuotaSample) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(L10n.remainingTraffic)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-            heroLine(s)
-            GradientBar(ratio: s.usedRatio, level: vm.warningLevel)
-            HStack(spacing: 6) {
-                Text(L10n.used(Fmt.bytes(s.used)))
-                    .font(.callout)
-                    .monospacedDigit()
-                Spacer()
-                Text(L10n.usedPercent(String(format: "%.1f", min(s.usedRatio, 1) * 100)))
-                    .font(.callout.weight(.bold))
-                    .foregroundStyle(vm.warningLevel.color)
-                    .monospacedDigit()
-                    .numericTransition(value: Int(s.usedRatio * 1000))
-                Spacer()
-                Text(L10n.total(Fmt.bytes(s.total)))
-                    .font(.callout)
-                    .monospacedDigit()
+    private func heroCard(_ sample: QuotaSample) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(L10n.remainingTraffic).font(.callout).foregroundStyle(.secondary)
+                Text(Fmt.bytes(sample.remaining))
+                .font(.system(size: quotaFontSize, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(vm.warningLevel.color)
+                .numericTransition(value: sample.remaining, reduceMotionOverride: reduceMotionOverride)
+                .accessibilityLabel(L10n.remainingTraffic)
+                .accessibilityValue(Fmt.bytes(sample.remaining))
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 6)
+            .background(alignment: .trailing) {
+                PawPrint(color: Color.primary.opacity(0.045))
+                    .frame(width: 64, height: 64)
+                    .rotationEffect(.degrees(-15))
+                    .padding(.trailing, 4)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+            GradientBar(ratio: sample.usedRatio, level: vm.warningLevel, reduceMotionOverride: reduceMotionOverride)
+            HStack(alignment: .firstTextBaseline) {
+                Text(L10n.used(Fmt.bytes(sample.used)))
+                Spacer(minLength: 8)
+                Text(L10n.total(Fmt.bytes(sample.total)))
+            }
+            .font(.callout)
+            .monospacedDigit()
             .foregroundStyle(.secondary)
+            HStack(alignment: .center, spacing: 8) {
+                Text(L10n.usedPercent(Fmt.percent(sample.usedRatio)))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+                    .numericTransition(value: sample.usedRatio, reduceMotionOverride: reduceMotionOverride)
+                Spacer()
+                if sample.remaining == 0 || vm.warningLevel != .normal {
+                    Label(sample.remaining == 0 ? tr("流量已用尽") : tr("流量不足"),
+                          systemImage: sample.remaining == 0 ? "exclamationmark.circle.fill" : "exclamationmark.triangle.fill")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(vm.warningLevel.color)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                        .background(vm.warningLevel.color.opacity(0.10), in: Capsule())
+                }
+            }
+            .font(.callout.weight(.medium))
+            Text(vm.freshness(sample))
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
-        .glassCard(in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassCard(in: RoundedRectangle(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(
+            Color.primary.opacity((highContrastOverride ?? (contrast == .increased)) ? 0.55 : 0), lineWidth: 1))
+        .accessibilityElement(children: .ignore)
+        .accessibilityAddTraits(.isStaticText)
+        .accessibilityLabel(L10n.remainingTraffic)
+        .accessibilityValue(quotaAccessibilityValue(sample))
     }
 
-
-    /// 剩余流量行：大数值 + 小总量的富文本（单 Text 共享基线，规避 HStack 基线传递失效）
-    private func heroLine(_ s: QuotaSample) -> Text {
-        let desc = NSFont.systemFont(ofSize: 34, weight: .bold).fontDescriptor.withDesign(.rounded)
-        let valueFont = desc.flatMap { NSFont(descriptor: $0, size: 34) } ?? .boldSystemFont(ofSize: 34)
-        var a = AttributedString(Fmt.bytes(s.remaining))
-        a.appKit.font = valueFont
-        a.appKit.foregroundColor = NSColor(vm.warningLevel.color)
-        var b = AttributedString(" / \(Fmt.bytes(s.total))")
-        b.appKit.font = .systemFont(ofSize: 13)
-        b.appKit.foregroundColor = .secondaryLabelColor
-        a += b
-        return Text(a)
+    private func quotaAccessibilityValue(_ sample: QuotaSample) -> String {
+        let risk = sample.remaining == 0 ? tr("流量已用尽") : vm.warningLevel != .normal ? tr("流量不足") : ""
+        return [Fmt.bytes(sample.remaining), L10n.used(Fmt.bytes(sample.used)),
+                L10n.total(Fmt.bytes(sample.total)), L10n.usedPercent(Fmt.percent(sample.usedRatio)),
+                risk, vm.freshness(sample)].filter { !$0.isEmpty }.joined(separator: ", ")
     }
 
     // MARK: 信息磁贴：上行 / 下行 / 流量重置 / 套餐到期
@@ -582,8 +620,10 @@ struct MenuView: View {
             tile(icon: "arrow.down", label: L10n.downloadTile, value: Fmt.bytes(s.downloaded))
             tile(icon: "arrow.clockwise",
                  label: L10n.resetTile,
-                 value: s.resetDay.map { Fmt.date(Fmt.nextReset(days: $0) ?? Date()) } ?? "—",
-                 sub: s.resetDay.map { vm.resetSubText(days: $0, now: vm.now) })
+                 value: s.resetDay.map { vm.countdownText(days: $0, now: vm.now) } ?? "—",
+                 sub: s.resetDay.flatMap { Fmt.nextReset(days: $0, from: vm.now) }.map {
+                     String(format: L10n.t("预计 %@"), Fmt.shortDate($0))
+                 })
             tile(icon: "calendar",
                  label: L10n.expireTile,
                  value: s.expireAt.map { Fmt.date($0) } ?? "—",
@@ -598,8 +638,8 @@ struct MenuView: View {
                 .frame(width: 44, height: 44)
                 .overlay(
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(vm.warningLevel.color)
+                        .font(.system(size: 16, weight: icon == "arrow.clockwise" ? .regular : .medium))
+                        .foregroundStyle(.primary)
                 )
             VStack(alignment: .leading, spacing: 3) {
                 Text(label)
@@ -669,38 +709,36 @@ struct MenuView: View {
                 } label: {
                     if vm.fetching {
                         ProgressView().controlSize(.small)
-                            .frame(width: 62)
+                            .frame(maxWidth: .infinity)
                     } else {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.clockwise")
                             Text(L10n.refresh)
                         }
                         .font(.callout.weight(.medium))
-                        .foregroundStyle(vm.warningLevel.color)
+                        .foregroundStyle(.primary)
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .disabled(vm.fetching || vm.selected == nil)
                 .glassButton()
 
-                Spacer()
-
                 Button {
-                    autostartOn.toggle()
-                    do {
-                        try autostartOn ? SMAppService.mainApp.register()
-                                        : SMAppService.mainApp.unregister()
-                    } catch {
-                        autostartOn.toggle()
-                    }
+                    updateLogin(displayedLoginStatus != .enabled && displayedLoginStatus != .requiresApproval)
                 } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: autostartOn ? "power.circle.fill" : "power.circle")
-                        Text(L10n.launchAtLogin)
+                        Image(systemName: displayedLoginStatus == .enabled ? "checkmark.circle.fill" : displayedLoginStatus == .requiresApproval ? "clock" : "circle")
+                        Text(displayedLoginStatus == .requiresApproval ? tr("等待系统批准") : displayedLoginStatus == .enabled ? tr("自启动已开启") : tr("自启动已关闭"))
                     }
                     .font(.callout.weight(.medium))
-                    .foregroundStyle(vm.warningLevel.color)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity)
                 }
                 .glassButton()
+                .accessibilityLabel(L10n.launchAtLogin)
+                .accessibilityValue(displayedLoginStatus == .requiresApproval ? tr("等待系统批准") : displayedLoginStatus == .enabled ? tr("自启动已开启") : tr("自启动已关闭"))
 
                 Button {
                     NSApp.terminate(nil)
@@ -710,7 +748,8 @@ struct MenuView: View {
                         Text(L10n.quit)
                     }
                     .font(.callout.weight(.medium))
-                    .foregroundStyle(vm.warningLevel.color)
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity)
                 }
                 .glassButton()
             }
@@ -725,6 +764,7 @@ struct MenuView: View {
             }
             .padding(.top, 2)
 
+            if let loginError { Text(loginError).font(.caption).foregroundStyle(.red) }
             if let line = vm.statusLine {
                 Text(line)
                     .font(.caption)
@@ -742,8 +782,8 @@ struct MenuView: View {
                 showAdd.toggle()
             } label: {
                 HStack(spacing: 9) {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(vm.warningLevel.color)
+                    Image(systemName: "plus.circle")
+                        .foregroundStyle(.primary)
                         .font(.system(size: 17))
                     VStack(alignment: .leading, spacing: 1) {
                         Text(L10n.addSubTitle)
@@ -752,6 +792,7 @@ struct MenuView: View {
                         Text(L10n.addSubSubtitle)
                             .font(.callout)
                             .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer()
                     Image(systemName: "chevron.down")
@@ -771,9 +812,9 @@ struct MenuView: View {
                         .onSubmit { submitCustom() }
                     Button(L10n.add) { submitCustom() }
                         .buttonStyle(.borderedProminent)
-                        .tint(vm.warningLevel.color)
+                        .tint(.accentColor)
                         .font(.callout.weight(.semibold))
-                        .disabled(!customURL.trimmingCharacters(in: .whitespaces).hasPrefix("http"))
+                        .disabled(Providers.validatedURL(customURL.trimmingCharacters(in: .whitespacesAndNewlines)) == nil)
                 }
                 .padding(.top, 10)
             }
@@ -782,10 +823,19 @@ struct MenuView: View {
         .glassCard(in: RoundedRectangle(cornerRadius: 15, style: .continuous))
     }
 
+    private func updateLogin(_ enabled: Bool) {
+        guard !vm.isPreview && allowsSystemChanges else { return }
+        loginError = nil
+        do {
+            if enabled { try SMAppService.mainApp.register() }
+            else { try SMAppService.mainApp.unregister() }
+        } catch { loginError = tr("无法更改开机启动。请在系统设置中检查登录项。") }
+        loginStatus = SMAppService.mainApp.status
+    }
+
     private func submitCustom() {
         let u = customURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard u.hasPrefix("http") else { return }
-        vm.addCustom(url: u)
+        guard vm.addCustom(url: u) else { return }
         customURL = ""
         showAdd = false
     }
@@ -796,17 +846,35 @@ struct PawPrint: View {
     var color: Color
 
     var body: some View {
-        GeometryReader { g in
-            let w = g.size.width, h = g.size.height
-            ZStack {
-                Ellipse().fill(color)
-                    .frame(width: w * 0.54, height: h * 0.40)
-                    .position(x: w * 0.5, y: h * 0.70)
-                Ellipse().fill(color).frame(width: w * 0.19, height: h * 0.24).position(x: w * 0.20, y: h * 0.32)
-                Ellipse().fill(color).frame(width: w * 0.19, height: h * 0.24).position(x: w * 0.50, y: h * 0.22)
-                Ellipse().fill(color).frame(width: w * 0.19, height: h * 0.24).position(x: w * 0.80, y: h * 0.32)
-            }
+        BrandPawShape().fill(color)
+    }
+}
+
+/// Rounded three-toe watermark, with a soft central pad rather than a circle.
+struct BrandPawShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var source = Path()
+        source.move(to: CGPoint(x: 50, y: 44))
+        source.addCurve(to: CGPoint(x: 24, y: 65), control1: CGPoint(x: 39, y: 44), control2: CGPoint(x: 34, y: 56))
+        source.addCurve(to: CGPoint(x: 25, y: 87), control1: CGPoint(x: 12, y: 77), control2: CGPoint(x: 15, y: 86))
+        source.addCurve(to: CGPoint(x: 50, y: 84), control1: CGPoint(x: 34, y: 90), control2: CGPoint(x: 40, y: 84))
+        source.addCurve(to: CGPoint(x: 75, y: 87), control1: CGPoint(x: 60, y: 84), control2: CGPoint(x: 66, y: 90))
+        source.addCurve(to: CGPoint(x: 76, y: 65), control1: CGPoint(x: 85, y: 86), control2: CGPoint(x: 88, y: 77))
+        source.addCurve(to: CGPoint(x: 50, y: 44), control1: CGPoint(x: 66, y: 56), control2: CGPoint(x: 61, y: 44))
+        source.closeSubpath()
+        for (center, angle) in [(CGPoint(x: 22, y: 34), -25.0),
+                                (CGPoint(x: 50, y: 20), 0.0),
+                                (CGPoint(x: 78, y: 34), 25.0)] {
+            let toe = Path(ellipseIn: CGRect(x: -10, y: -14, width: 20, height: 28))
+                .applying(CGAffineTransform(rotationAngle: angle * .pi / 180))
+                .applying(CGAffineTransform(translationX: center.x, y: center.y))
+            source.addPath(toe)
         }
+        let bounds = source.boundingRect
+        let scale = min(rect.width / bounds.width, rect.height / bounds.height)
+        return source.applying(CGAffineTransform(translationX: -bounds.midX, y: -bounds.midY))
+            .applying(CGAffineTransform(scaleX: scale, y: scale))
+            .applying(CGAffineTransform(translationX: rect.midX, y: rect.midY))
     }
 }
 
@@ -846,6 +914,8 @@ struct CatEarShape: Shape {
 struct GradientBar: View {
     let ratio: Double
     let level: WarningLevel
+    var reduceMotionOverride: Bool?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         GeometryReader { g in
@@ -854,9 +924,12 @@ struct GradientBar: View {
                 Capsule()
                     .fill(LinearGradient(colors: [level.color.opacity(0.65), level.color],
                                          startPoint: .leading, endPoint: .trailing))
-                    .frame(width: max(6, g.size.width * min(max(ratio, 0), 1)))
+                    .frame(width: g.size.width * min(max(ratio, 0), 1))
+                    .animation((reduceMotionOverride ?? reduceMotion) ? nil : .easeOut(duration: 0.25), value: ratio)
             }
         }
         .frame(height: 7)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(L10n.usedPercent(Fmt.percent(ratio)))
     }
 }
