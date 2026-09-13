@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">ByteKibble</h1>
-<p align="center"><a href="https://mustundead.com">Mustundead의 MU Labs</a> 제작</p>
+<p align="center"><a href="https://mustundead.com">MU Labs</a> 제작</p>
 <p align="center">구독 데이터 잔여량을 한눈에.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · 한국어 · <a href="README.ja.md">日本語</a></p>
 
@@ -90,12 +90,10 @@ swift build -c release
 
 ## 피드백과 라이선스
 
-[Issues](https://github.com/mustundead/ByteKibble/issues)에 macOS 버전, 앱 버전, 클라이언트 이름, 민감한 정보를 가린 재현 절차를 남겨 주세요. 앞으로 새 조건에 따라 처음 배포하는 독자적 저작물에는 [소스 공개·비상업적 라이선스](LICENSE)를 적용합니다. 비상업적 사용은 무료이며 상업적 사용에는 Mustundead의 사전 서면 승인이 필요합니다. 상업적 사용 제한이 있으므로 표준 오픈 소스 라이선스로 부르지 않습니다.
+[Issues](https://github.com/mustundead/ByteKibble/issues)에 macOS 버전, 앱 버전, 클라이언트 이름, 민감한 정보를 가린 재현 절차를 남겨 주세요. 앞으로 새 조건에 따라 처음 배포하는 독자적 저작물에는 [소스 공개·비상업적 라이선스](LICENSE)를 적용합니다. 비상업적 사용은 무료이며 상업적 사용에는 권리자의 사전 서면 승인이 필요합니다. 상업적 사용 제한이 있으므로 표준 오픈 소스 라이선스로 부르지 않습니다.
 
-### 제작자와 출처 표기
+### MU Labs
 
-개인 홈페이지: [mustundead.com](https://mustundead.com). Mustundead의 MU Labs에서 제작했습니다.
-
-새 라이선스가 적용되는 코드를 재사용할 때는 저작권 및 라이선스 고지를 유지하고 “ByteKibble — Mustundead / MU Labs”, 개인 홈페이지와 [저장소](https://github.com/mustundead/ByteKibble)를 표기해야 합니다. 적용 범위와 표기 위치는 [LICENSE](LICENSE)를 확인하세요. 상업적 이용 승인은 [개인 홈페이지](https://mustundead.com)를 통해 요청해 주세요. 요청만으로 허가가 주어지는 것은 아닙니다.
+[MU Labs](https://mustundead.com)에서 제작했습니다. 코드 재사용, 출처 표기 및 상업적 이용 승인 요건은 [LICENSE](LICENSE)를 확인하세요.
 
 **기존 허가는 유지됩니다.** 이전에 MIT로 제공한 코드와 버전(1.2.0 (41) 검수용 패키지 포함)에는 상업적 사용 권리를 포함한 [기존 MIT 조건](LICENSES/MIT-legacy.txt)이 계속 적용됩니다. 새로 배포하는 자료의 적용 범위는 [LICENSE](LICENSE)를 확인하세요.

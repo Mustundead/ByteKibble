@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">字节猫粮 · ByteKibble</h1>
-<p align="center">由 <a href="https://mustundead.com">Mustundead 的 MU Labs</a> 出品</p>
+<p align="center">由 <a href="https://mustundead.com">MU Labs</a> 出品</p>
 <p align="center">订阅流量，抬眼就见。</p>
 <p align="center">简体中文 · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
@@ -90,12 +90,10 @@ swift build -c release
 
 ## 反馈与许可
 
-通过 [Issues](https://github.com/mustundead/ByteKibble/issues) 反馈问题，请附 macOS 版本、应用版本、客户端名称和脱敏后的复现步骤。后续首次按新许可发布的原创内容采用[源码公开、非商业许可](LICENSE)：非商用免费，商用须事先取得 Mustundead 的书面授权。由于含有商业用途限制，不再称为标准开源许可。
+通过 [Issues](https://github.com/mustundead/ByteKibble/issues) 反馈问题，请附 macOS 版本、应用版本、客户端名称和脱敏后的复现步骤。后续首次按新许可发布的原创内容采用[源码公开、非商业许可](LICENSE)：非商用免费，商用须事先取得 权利人的书面授权。由于含有商业用途限制，不再称为标准开源许可。
 
-### 作者与代码署名
+### MU Labs
 
-个人主页：[mustundead.com](https://mustundead.com)。由 Mustundead 的 MU Labs 出品。
-
-复用新许可覆盖的代码时，须保留版权与许可文本，并注明「字节猫粮（ByteKibble）— Mustundead / MU Labs」、个人主页和[项目地址](https://github.com/mustundead/ByteKibble)。具体范围和署名位置见 [LICENSE](LICENSE)。商业授权请通过[个人主页](https://mustundead.com)联系；申请不等于获准。
+由 [MU Labs](https://mustundead.com) 出品。代码复用、署名与商业授权要求见 [LICENSE](LICENSE)。
 
 **不追溯旧授权。** 此前按 MIT 提供的代码和版本（包括 1.2.0（41）验收包）继续适用[原 MIT 许可](LICENSES/MIT-legacy.txt)，原有商用权限不受影响。新发布内容的适用范围以 [LICENSE](LICENSE) 为准。

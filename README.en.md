@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">ByteKibble</h1>
-<p align="center">Made by <a href="https://mustundead.com">MU Labs, by Mustundead</a></p>
+<p align="center">Made by <a href="https://mustundead.com">MU Labs</a></p>
 <p align="center">Your subscription allowance, at a glance.</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · English · <a href="README.ko.md">한국어</a> · <a href="README.ja.md">日本語</a></p>
 
@@ -90,12 +90,10 @@ There are no third-party runtime dependencies. Run `swift test -j 2` for tests. 
 
 ## Feedback and license
 
-Report problems in [Issues](https://github.com/mustundead/ByteKibble/issues) with your macOS version, app version, client name and redacted reproduction steps. New original material first distributed under the new terms uses the [source-available noncommercial license](LICENSE): noncommercial use is free; commercial use requires prior written authorization from Mustundead. This commercial restriction means it is not a standard open-source license.
+Report problems in [Issues](https://github.com/mustundead/ByteKibble/issues) with your macOS version, app version, client name and redacted reproduction steps. New original material first distributed under the new terms uses the [source-available noncommercial license](LICENSE): noncommercial use is free; commercial use requires prior written authorization from the rights holder. This commercial restriction means it is not a standard open-source license.
 
-### Author and attribution
+### MU Labs
 
-Personal website: [mustundead.com](https://mustundead.com). Made by Mustundead's MU Labs.
-
-When reusing code covered by the new license, retain copyright and license notices and credit “ByteKibble — Mustundead / MU Labs”, the personal website and [this repository](https://github.com/mustundead/ByteKibble). See [LICENSE](LICENSE) for scope and attribution placement. Request commercial authorization through [the personal website](https://mustundead.com); a request is not permission.
+Made by [MU Labs](https://mustundead.com). See [LICENSE](LICENSE) for code reuse, attribution and commercial authorization requirements.
 
 **Existing permissions are preserved.** Code and versions previously provided under MIT, including the 1.2.0 (41) acceptance package, retain the [legacy MIT terms](LICENSES/MIT-legacy.txt), including commercial-use rights. See [LICENSE](LICENSE) for the scope of the terms covering newly distributed material.

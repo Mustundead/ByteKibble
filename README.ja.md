@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">ByteKibble</h1>
-<p align="center"><a href="https://mustundead.com">Mustundead の MU Labs</a> が制作</p>
+<p align="center"><a href="https://mustundead.com">MU Labs</a> が制作</p>
 <p align="center">サブスクリプションの残り通信量を、ひと目で。</p>
 <p align="center"><a href="README.md">简体中文</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.en.md">English</a> · <a href="README.ko.md">한국어</a> · 日本語</p>
 
@@ -90,12 +90,10 @@ swift build -c release
 
 ## フィードバックとライセンス
 
-[Issues](https://github.com/mustundead/ByteKibble/issues) に macOS とアプリのバージョン、クライアント名、機密情報を除いた再現手順をお知らせください。今後、新しい条件で初めて配布する独自の成果物には[ソース公開・非商用ライセンス](LICENSE)を適用します。非商用利用は無料、商用利用には Mustundead の事前の書面による許可が必要です。商用制限があるため、標準的なオープンソースライセンスとは呼びません。
+[Issues](https://github.com/mustundead/ByteKibble/issues) に macOS とアプリのバージョン、クライアント名、機密情報を除いた再現手順をお知らせください。今後、新しい条件で初めて配布する独自の成果物には[ソース公開・非商用ライセンス](LICENSE)を適用します。非商用利用は無料、商用利用には 権利者の事前の書面による許可が必要です。商用制限があるため、標準的なオープンソースライセンスとは呼びません。
 
-### 作者とクレジット
+### MU Labs
 
-個人サイト：[mustundead.com](https://mustundead.com)。Mustundead の MU Labs が制作しています。
-
-新ライセンスの対象コードを再利用する場合は、著作権表示とライセンス文を保持し、「ByteKibble — Mustundead / MU Labs」、個人サイト、[リポジトリ](https://github.com/mustundead/ByteKibble)を明記してください。対象範囲と表示場所は [LICENSE](LICENSE) をご確認ください。商用許可は[個人サイト](https://mustundead.com)からお問い合わせください。申請だけでは許可になりません。
+[MU Labs](https://mustundead.com) が制作。コードの再利用、クレジット、商用許可の要件は [LICENSE](LICENSE) を参照してください。
 
 **過去の許諾は変更しません。** 以前 MIT で提供したコードとバージョン（1.2.0（41）の確認用パッケージを含む）には、商用利用の権利を含めて[従来の MIT 条件](LICENSES/MIT-legacy.txt)が引き続き適用されます。新たに配布する内容の適用範囲は [LICENSE](LICENSE) を参照してください。
