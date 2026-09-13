@@ -25,6 +25,8 @@ Apple silicon（arm64）测试版，Developer ID 签名，**尚未 Apple 公证*
 
 build 49 的 Developer ID 深层严格签名验证、Hardened Runtime 与时间戳检查、DMG 校验和两个 ZIP 完整性检查通过；OTA ZIP 的 EdDSA 签名已在本地验证。
 
+GitHub 四个附件已上传且摘要与本地一致；从公开地址重新下载应用 ZIP 后，SHA-256 与 EdDSA 验证通过。此为下载与包签名验证，不等同于真实用户 OTA 安装验收。
+
 ## English
 
 Adds documented Stash, Clash, Surge, Hiddify, Loon and sing-box import-link parsing. Only the HTTPS subscription address is extracted; client actions and configuration are not executed. Provider quota metadata is still required. No new automatic discovery or verified Shadowrocket-specific integration. 39 local tests passed; not an end-to-end certification of every client or provider. Developer ID signed, Apple silicon prerelease, **not notarized**. Build 48's separate notarization submission does not apply to this build.
