@@ -24,6 +24,8 @@ final class InMemoryCredentialStore: CredentialStore {
 
 final class KeychainCredentialStore: CredentialStore {
     private let service: String
+    // Keep the legacy service name when changing the app bundle ID so existing
+    // subscription credentials retain the same Keychain lookup namespace.
     init(service: String = "com.bytekibble.credentials") { self.service = service }
     func read(for key: String) -> String? {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,

@@ -1,0 +1,16 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+A01 = {isa = PBXProject; buildConfigurationList = A10; compatibilityVersion = "Xcode 14.0"; mainGroup = A02; productRefGroup = A03; targets = (A04); };
+A02 = {isa = PBXGroup; children = (A05,A03); sourceTree = "<group>"; };
+A03 = {isa = PBXGroup; children = (A06); name = Products; sourceTree = "<group>"; };
+A04 = {isa = PBXNativeTarget; name = ByteKibbleSigning; productName = ByteKibbleSigning; productReference = A06; productType = "com.apple.product-type.application"; buildConfigurationList = A11; buildPhases = (A08,A09); dependencies = (); };
+A05 = {isa = PBXFileReference; path = main.swift; sourceTree = SOURCE_ROOT; lastKnownFileType = sourcecode.swift; };
+A06 = {isa = PBXFileReference; path = ByteKibbleSigning.app; sourceTree = BUILT_PRODUCTS_DIR; explicitFileType = wrapper.application; };
+A07 = {isa = PBXBuildFile; fileRef = A05; };
+A08 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A07); runOnlyForDeploymentPostprocessing = 0; };
+A09 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+A10 = {isa = XCConfigurationList; buildConfigurations = (A12); defaultConfigurationName = Debug; };
+A11 = {isa = XCConfigurationList; buildConfigurations = (A13); defaultConfigurationName = Debug; };
+A12 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {SDKROOT = macosx; MACOSX_DEPLOYMENT_TARGET = 13.0; SWIFT_VERSION = 5.0; }; };
+A13 = {isa = XCBuildConfiguration; name = Debug; buildSettings = {PRODUCT_BUNDLE_IDENTIFIER = com.mulabs.bytekibble; PRODUCT_NAME = ByteKibbleSigning; GENERATE_INFOPLIST_FILE = YES; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = 46P646AZCB; CODE_SIGN_ENTITLEMENTS = ByteKibble.entitlements; ENABLE_HARDENED_RUNTIME = YES; }; };
+}; rootObject = A01; }

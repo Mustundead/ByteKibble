@@ -373,20 +373,15 @@ extension View {
         }
     }
 
-    /// 面板实色底：macOS 15+ 用系统窗口容器背景（四角按窗口形状精确裁切，无瑕疵）；
-    /// 旧系统回退为手绘圆角矩形
+    /// The large reading surface stays opaque; glass is reserved for cards and controls.
+    /// AppKit clips the native popover and its arrow as one surface.
     @ViewBuilder
     func panelSolidBackground(nativePopover: Bool = false) -> some View {
         if nativePopover {
-            self
-        } else if #available(macOS 15.0, *) {
-            self.containerBackground(for: .window) {
-                Color(nsColor: .windowBackgroundColor)
-            }
+            self.background { PanelBackdrop() }
         } else {
             self.background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(nsColor: .windowBackgroundColor))
+                PanelBackdrop().clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             )
         }
     }
@@ -395,6 +390,33 @@ extension View {
     @ViewBuilder
     func numericTransition(value: some Equatable, reduceMotionOverride: Bool? = nil) -> some View {
         modifier(QuotaNumericTransition(value: value, reduceMotionOverride: reduceMotionOverride))
+    }
+}
+
+struct PanelBackdrop: View {
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.colorSchemeContrast) private var contrast
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    var body: some View {
+        let dark = colorScheme == .dark
+        let base = Color(nsColor: Self.solidColor(dark: dark))
+        let elevated = dark ? Color(red: 0.182, green: 0.174, blue: 0.160)
+                            : Color(red: 0.991, green: 0.987, blue: 0.979)
+        ZStack {
+            base
+            if contrast != .increased && !reduceTransparency {
+                LinearGradient(colors: [elevated, base], startPoint: .top, endPoint: .bottom)
+                RadialGradient(colors: [Color.orange.opacity(dark ? 0.06 : 0.05), .clear],
+                               center: .topLeading, startRadius: 0, endRadius: 400)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    static func solidColor(dark: Bool) -> NSColor {
+        dark ? NSColor(calibratedRed: 0.125, green: 0.121, blue: 0.116, alpha: 1)
+             : NSColor(calibratedRed: 0.973, green: 0.970, blue: 0.962, alpha: 1)
     }
 }
 
@@ -810,8 +832,18 @@ struct MenuView: View {
                 .glassButton()
             }
 
-            HStack {
+            HStack(spacing: 2) {
                 Spacer()
+                Button { SyncWindow.shared.show(vm: vm) } label: {
+                    Image(systemName: "icloud")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 28, height: 22, alignment: .trailing)
+                        .contentShape(Rectangle())
+                }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tr("同步与传输"))
+                    .disabled(!allowsSystemChanges || vm.isPreview)
                 UpdateMenu()
                 Spacer()
             }

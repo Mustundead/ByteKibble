@@ -2,6 +2,9 @@
 .build-arm/
 .build-x64/
 .build-audit/
+.build-audit-core/
+.build-test-bundle-id/
+Packages/**/.build/
 output/
 dist/
 .DS_Store

@@ -1,0 +1,6 @@
+"保存订阅链接" = "Save Subscription Link";
+"仅保存到此设备的钥匙串。下次打开 ByteKibble 后，可确认添加；此操作不会联网查询或上传链接。" = "Save to this device’s Keychain, then open ByteKibble to confirm adding the subscription. This action does not query or upload the link.";
+"保存到 ByteKibble" = "Save to ByteKibble";
+"未能保存。请解锁设备；若已有待添加链接，请先在 ByteKibble 中处理。" = "Couldn’t save. Unlock your device, or open ByteKibble to handle a previously saved link first.";
+"请选择一条有效的 HTTPS 订阅链接。" = "Select one valid HTTPS subscription link.";
+"取消" = "Cancel";

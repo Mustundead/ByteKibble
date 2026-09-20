@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 app_path="${1:?Usage: bash scripts/prepare-update.sh /absolute/ByteKibble.app}"
 plist="$app_path/Contents/Info.plist"
-test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")" = com.bytekibble.app
+test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")" = com.mulabs.bytekibble
 test "$(/usr/libexec/PlistBuddy -c 'Print :SUPublicEDKey' "$plist")" = FFo6GQ0easmXdjP3wlXJCN9l/cD7jBHPT3SwXLA1yuY=
 codesign --verify --deep --strict "$app_path"
 signature_details=$(codesign -dvv "$app_path" 2>&1)
@@ -21,4 +21,4 @@ signature=$("$bin/sign_update" --account mu-labs.bytekibble -p "$archive")
 "$bin/generate_appcast" --account mu-labs.bytekibble --maximum-deltas 0 \
   --download-url-prefix "https://github.com/mustundead/ByteKibble/releases/download/v$version-build$build/" "$candidate"
 shasum -a 256 "$archive"
-printf 'Candidate only: %s\nUpload and verify the archive before publishing preview.xml.\n' "$candidate"
+printf 'Candidate only: %s\nUpload and verify the archive before publishing mulabs.xml; never put the new bundle ID in the legacy preview.xml feed.\n' "$candidate"

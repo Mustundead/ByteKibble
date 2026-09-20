@@ -14,6 +14,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuController: MenuPopoverController?
     func applicationDidFinishLaunching(_ notification: Notification) {
 #if !BYTEKIBBLE_ACCEPTANCE
+        if let index = CommandLine.arguments.firstIndex(of: "--cloud-acceptance"),
+           CommandLine.arguments.count > index + 1,
+           let id = UUID(uuidString: CommandLine.arguments[index + 1]) {
+            Task {
+                let passed = await CloudAcceptance.run(id: id, cleanup: CommandLine.arguments.contains("--cleanup-fixture"))
+                exit(passed ? 0 : 1)
+            }
+            return
+        }
         AppUpdater.shared.start()
         // An accessory app has no visible app menu, but standard edit commands
         // still need a responder-chain menu for text-field keyboard shortcuts.
@@ -30,7 +39,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         editItem.submenu = editMenu
         mainMenu.addItem(editItem)
         NSApp.mainMenu = mainMenu
-        menuController = MenuPopoverController(vm: ViewModel())
+        let vm = ViewModel()
+        menuController = MenuPopoverController(vm: vm)
+        SyncWindow.shared.resume(vm: vm)
+        if CommandLine.arguments.contains("--show-sync") { SyncWindow.shared.show(vm: vm) }
         if WelcomeState(defaults: .standard).shouldPresent {
             DispatchQueue.main.async { WelcomeController.shared.show() }
         }

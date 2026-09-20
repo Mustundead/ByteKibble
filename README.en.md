@@ -1,4 +1,4 @@
-> **Build 50 released**: Keychain migration, a 2 MiB body limit, retry/cancellation improvements and same-origin HTTPS redirect validation. 55 automated tests and 11 real-Keychain checks inside the signed candidate passed using isolated dummy subscriptions. **Developer ID signed, not notarized by Apple.** [Verification scope and remaining limitations](docs/security-hardening.md).
+> **Build 51 manual-install preview**: A more legible, subtly warm menu popover, quieter sync icon, and a fix for opening Sync in builds without iCloud entitlements. The macOS bundle ID changes to `com.mulabs.bytekibble`; this is **not an in-place upgrade from build 50**. Existing users should preserve the old app and its data; migration is unverified. iCloud Sync is not enabled in this downloadable Mac package; encrypted manual transfer remains available. Developer ID signed, **not notarized by Apple**. [Download and full notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build51).
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: a warm gold kibble bag with a paw mark">
@@ -11,7 +11,7 @@
 
 ByteKibble is a native macOS menu bar app for **remaining and used data, subscription expiry, and reset reminders**. It can discover subscriptions from supported Clash-family clients and SNTP, accept manual HTTPS subscription links used with Quantumult / Quantumult X and Surge, and parse Shadowsocks SIP008 quota fields. Available readings depend on the provider's data; see the compatibility conditions below.
 
-> **1.2.0 (50) prerelease**: app source, a first-launch welcome screen, and Apple silicon (arm64) packages. Developer ID signed; **not notarized by Apple**. [Downloads and full release notes](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50). Images in `preview/` are historical.
+> **1.2.0 (51) prerelease**: Apple silicon (arm64) manual-install package. Existing build 50 users should read the migration warning above; the [build 50 download](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50) remains available. Images in `preview/` are historical.
 
 **In-app updates (build 47 onward):** Click the version footer to check for updates or disable automatic checks. Installation requires confirmation. Build 46 and earlier need one manual upgrade first. Checks contact GitHub without sending subscription links or quota data; previews use a separate feed.
 

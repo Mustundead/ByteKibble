@@ -52,7 +52,11 @@ final class MenuPopoverController: NSObject, NSPopoverDelegate {
         popover.animates = !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         NSApp.activate(ignoringOtherApps: true)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        popover.contentViewController?.view.window?.makeKey()
+        if let window = popover.contentViewController?.view.window {
+            let dark = popover.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            window.backgroundColor = PanelBackdrop.solidColor(dark: dark)
+            window.makeKey()
+        }
     }
 
     func popoverDidClose(_ notification: Notification) {
@@ -74,6 +78,7 @@ final class MenuPopoverController: NSObject, NSPopoverDelegate {
 
     func setPreviewAppearance(dark: Bool) {
         popover.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+        popover.contentViewController?.view.window?.backgroundColor = PanelBackdrop.solidColor(dark: dark)
     }
 #endif
 }

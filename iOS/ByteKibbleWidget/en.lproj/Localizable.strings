@@ -1,0 +1,7 @@
+"剩余流量" = "Remaining Allowance";
+"暂无读数" = "No Reading Yet";
+"旧读数 · 打开 App 更新" = "Stale reading · Open app to update";
+"上次读取" = "Last read";
+"选择一个订阅" = "Choose a Subscription";
+"打开 App，在设置中选择小组件订阅。已有订阅需先查询流量。" = "Open the app and choose a widget subscription in Settings. Existing subscriptions must be queried first.";
+"查看本机保存的流量快照。打开 App 查询最新读数。" = "View an allowance snapshot saved on this device. Open the app to query the latest reading.";

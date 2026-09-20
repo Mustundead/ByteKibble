@@ -1,5 +1,15 @@
 # 更新记录 / Changelog
 
+## 1.2.0（51）— 2026-09-20 · 手动安装测试版
+
+- macOS 正式 Bundle ID 改为 `com.mulabs.bytekibble`；iOS 工程及共享同步核心源码进入仓库，但 iOS 尚未通过 App Store 发布。
+- 菜单栏原生弹窗保留圆角与连接的箭头，改用不透底、轻微暖橙氛围的明暗自适应背景；同步云朵成为次级图标，收紧与版本文字的间距，保留点击区域。
+- 修复未配置 iCloud 权限的 Mac 包在打开“同步与传输”时因过早构造 CloudKit 容器而闪退。此下载包不含 iCloud 签名权限，只提供加密手动传输；开发签名的跨设备同步验证不代表发行包可用。
+- 核心库 37 项、macOS App 55 项自动测试通过；独立 QA 包中打开同步窗口及无权限提示、原生弹窗明暗外观已验证。Developer ID、Hardened Runtime、时间戳及深度签名检查通过，**尚未 Apple 公证**。
+- 新旧 Bundle ID 不能通过原有 Sparkle 源原位升级；旧 `preview.xml` 保持 build 50，新 `mulabs.xml` 暂无更新项。原有订阅、钥匙串与偏好迁移尚未用真实旧版安装验证。不要删除旧版或其数据；本次仅供手动安装测试。
+
+English: Build 51 is a manual-install Apple silicon prerelease with a new `com.mulabs.bytekibble` identity, a legible subtly warm native popover, and a fix for opening Sync without CloudKit entitlements. Its downloadable Mac app has no iCloud capability; encrypted manual transfer remains available. It is Developer ID signed, not notarized. This is not an in-place update for build 50; preserve the old app and data until migration is verified. The new update feed has no item.
+
 ## 1.2.0（50）— 2026-09-13
 
 - 手动订阅使用本机钥匙串保存；旧数据写入并读回验证成功后迁移，失败保留旧记录并提示。选择状态与手动重置日期使用哈希索引，历史备份及其他客户端配置不变。

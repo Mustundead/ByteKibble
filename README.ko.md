@@ -1,4 +1,4 @@
-> **build 50 배포**: 키체인 이전, 본문 2 MiB 제한, 재시도·취소 개선, 동일 출처 HTTPS 리디렉션 검증. 독립된 가상 구독으로 자동 테스트 55개와 서명된 후보의 실제 키체인 검사 11개를 통과했습니다. **Developer ID 서명 완료, Apple 미공증입니다.** [검증 범위와 남은 제한](docs/security-hardening.md).
+> **build 51 수동 설치 시험판**: 읽기 쉬운 은은한 따뜻한 회색 메뉴 패널, 눈에 덜 띄는 동기화 아이콘, iCloud 권한이 없는 빌드에서 동기화 창을 열 때의 종료 문제를 수정했습니다. macOS Bundle ID는 `com.mulabs.bytekibble`로 변경되어 **build 50에서 제자리 업그레이드되지 않습니다**. 기존 앱과 데이터를 보존하세요. 이전은 아직 검증되지 않았습니다. 이 다운로드용 Mac 패키지에서는 iCloud 동기화가 비활성화되어 있으며 암호화된 수동 전송을 사용할 수 있습니다. Developer ID 서명 완료, **Apple 미공증**. [다운로드와 전체 설명](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build51).
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble: 발바닥 무늬가 있는 따뜻한 금빛 사료 봉투">
@@ -11,7 +11,7 @@
 
 ByteKibble은 **잔여 데이터, 사용량, 구독 만료일 및 초기화 알림**을 확인하는 macOS 메뉴 막대 앱입니다. 지원되는 Clash 계열 클라이언트와 SNTP의 구독을 자동으로 찾고, Quantumult / Quantumult X와 Surge에서 사용하는 HTTPS 구독 링크를 직접 추가할 수 있으며 Shadowsocks SIP008 사용량 필드를 읽습니다. 표시되는 정보는 제공업체가 반환하는 데이터에 따라 달라집니다. 자세한 조건은 아래 호환 범위를 확인하세요.
 
-> **1.2.0 (50) 프리릴리스**: 앱 소스, 첫 실행 환영 화면, Apple silicon (arm64) 패키지를 제공합니다. Developer ID로 서명했지만 **Apple 공증은 받지 않았습니다**. [다운로드 및 변경 사항](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50). `preview/`의 이미지는 과거 버전입니다.
+> **1.2.0 (51) 프리릴리스**: Apple silicon (arm64) 수동 설치 패키지입니다. 기존 build 50 사용자는 위의 이전 경고를 먼저 읽으세요. [build 50 다운로드](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)는 유지됩니다. `preview/`의 이미지는 과거 버전입니다.
 
 **앱 내 업데이트(build 47부터):** 하단 버전 번호에서 업데이트를 확인하거나 자동 확인을 끌 수 있습니다. 설치에는 사용자 확인이 필요합니다. build 46 이하는 먼저 한 번 수동으로 업데이트해야 합니다. 업데이트 확인은 GitHub에 연결하지만 구독 링크나 사용량은 전송하지 않습니다. 미리 보기 버전은 별도 업데이트 피드를 사용합니다.
 

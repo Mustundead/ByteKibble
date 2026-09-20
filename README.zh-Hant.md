@@ -1,4 +1,4 @@
-> **build 50 已發佈**：鑰匙圈遷移、2 MiB 本文限制、重試與取消最佳化，以及同源 HTTPS 重新導向驗證。55 項自動測試及簽名候選包的 11 項真實鑰匙圈檢查通過，使用獨立模擬訂閱。**Developer ID 簽名，尚未經 Apple 公證。** [驗證範圍與剩餘限制](docs/security-hardening.md)。
+> **build 51 手動安裝測試版**：選單列面板採用清晰的暖灰背景、降低同步圖示的視覺比重，並修正未設定 iCloud 權限時開啟同步視窗會閃退的問題。macOS Bundle ID 改為 `com.mulabs.bytekibble`，**不是 build 50 的原位升級**；現有使用者應保留舊版與資料，遷移尚未驗證。此下載包未啟用 iCloud 同步，可使用加密手動傳輸。Developer ID 已簽名，**尚未經 Apple 公證**。[下載與完整說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build51)。
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="字節貓糧：印有貓爪的暖金色糧袋圖示">
@@ -11,7 +11,7 @@
 
 字節貓糧是一款原生 macOS 選單列訂閱流量工具，用來查看**剩餘流量、已用流量、方案到期資訊與重置提醒**。它可自動探索受支援的 Clash 系用戶端及守候網路（SNTP）訂閱，也可手動加入 Quantumult／Quantumult X、Surge 使用的 HTTPS 訂閱連結，並解析 Shadowsocks SIP008 流量欄位。可顯示的資訊取決於服務商回傳的資料，具體條件請見下方相容性說明。
 
-> **1.2.0（50）測試版**：提供應用程式碼、首次使用歡迎頁及 Apple silicon（arm64）安裝包。已使用 Developer ID 簽署，**尚未經 Apple 公證**。[下載與完整更新說明](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)。`preview/` 中的舊截圖為歷史資料。
+> **1.2.0（51）測試版**：Apple silicon（arm64）手動安裝包。現有 build 50 使用者請先閱讀上述遷移限制；[build 50 下載頁](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)仍保留。`preview/` 中的舊截圖為歷史資料。
 
 **App 內更新（build 47 起）**：點擊底部版本號可檢查更新或關閉自動檢查，安裝須由使用者確認。build 46 及更早版本須先手動安裝一次新版。更新檢查會連線至 GitHub，不傳送訂閱連結或流量資料；測試版使用獨立更新來源。
 

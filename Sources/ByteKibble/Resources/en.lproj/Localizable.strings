@@ -102,3 +102,38 @@
 "未能安全保存订阅。请解锁钥匙串后重试。" = "Couldn’t securely save the subscription. Unlock Keychain and try again.";
 "未能移除订阅。记录已保留，请解锁钥匙串后重试。" = "Couldn’t remove the subscription. Its record is preserved. Unlock Keychain and try again.";
 "订阅重定向已被阻止。请添加服务商提供的最终 HTTPS 地址。" = "Subscription redirect blocked. Add the final HTTPS URL supplied by your provider.";
+
+/* iCloud sync and encrypted manual transfer. */
+"同步与传输" = "Sync & Transfer";
+"先在 Mac 上选择订阅并同步，再在 iPhone 上开启 iCloud。两台设备须登录同一 Apple 账户并开启 iCloud 钥匙串。" = "Select and sync subscriptions on your Mac first, then enable iCloud on your iPhone. Both devices must use the same Apple Account and have iCloud Keychain enabled.";
+"开启 iCloud 同步" = "Enable iCloud Sync";
+"立即同步" = "Sync Now";
+"关闭此设备的同步" = "Turn Off Sync on This Mac";
+"部分数据仍在等待。请解锁设备并确认 iCloud 钥匙串已开启后重试。" = "Some data is still pending. Unlock your device, make sure iCloud Keychain is enabled, then try again.";
+"未能保存同步更改。请解锁钥匙串后重试。" = "Unable to save sync changes. Unlock Keychain and try again.";
+"两台设备都修改了此订阅。请选择要保留的版本。" = "This subscription was changed on both devices. Choose the version to keep.";
+"保留此设备版本" = "Keep This Mac Version";
+"使用 iCloud 版本" = "Use iCloud Version";
+"选择要同步的订阅" = "Choose Subscriptions to Sync";
+"无法使用 iCloud 时，可通过加密文件传输订阅。文件和解密密钥请分开保存，不要公开分享。" = "When iCloud isn’t available, transfer subscriptions with an encrypted file. Keep the file and decryption key separately, and don’t share them publicly.";
+"导出当前订阅" = "Export Current Subscription";
+"粘贴解密密钥" = "Paste Decryption Key";
+"导入加密文件" = "Import Encrypted File";
+"手动传输" = "Manual Transfer";
+"同步包含订阅链接、名称、读数、历史和手动重置日期。查询直接连接服务商，不发送到 MU LABS。关闭同步不会删除本机或 iCloud 数据。" = "Sync includes subscription links, names, readings, history, and manual reset dates. Queries connect directly to providers and aren’t sent to MU LABS. Turning off sync doesn’t delete data on this Mac or in iCloud.";
+"开启 iCloud 同步？" = "Enable iCloud Sync?";
+"开启并接收数据" = "Enable and Receive Data";
+"此安装包尚未配置 iCloud 签名权限。可先使用加密手动传输。" = "This app build doesn’t have iCloud signing configured yet. You can use encrypted manual transfer first.";
+"未能连接 iCloud。请检查 Apple 账户、网络和签名权限。" = "Unable to connect to iCloud. Check your Apple Account, network connection, and signing permissions.";
+"只同步你选择的订阅。其他客户端的配置不会被修改。" = "Only the subscriptions you select are synced. Other client configurations aren’t changed.";
+"尚未选择订阅。请在下方选择要同步的订阅。" = "No subscriptions are selected yet. Choose subscriptions to sync below.";
+"同步未完成。现有数据已保留，请检查网络或解锁钥匙串后重试。" = "Sync didn’t finish. Existing data is kept; check your network or unlock Keychain, then try again.";
+"无法导出。请检查可用存储空间。" = "Unable to export. Check available storage space.";
+"导入订阅？" = "Import Subscriptions?";
+"将添加文件中的订阅。已有相同链接会保留，不修改客户端配置。" = "Subscriptions in the file will be added. Existing matching links are kept, and client configurations aren’t changed.";
+"导入" = "Import";
+"导入完成" = "Import Complete";
+"未能导入。请检查文件、密钥和钥匙串权限。已导入的订阅会保留。" = "Unable to import. Check the file, key, and Keychain permissions. Any subscriptions already imported are kept.";
+/* Remote removal recovery */
+"此订阅已从 iCloud 移除。本机副本仍保留。" = "This subscription was removed from iCloud. Your local copy is still available.";
+"保留本机副本并停止同步" = "Keep Local Copy and Stop Syncing";

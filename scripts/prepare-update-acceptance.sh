@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 qa_app="${1:?Pass the absolute QA app path}"
-test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$qa_app/Contents/Info.plist")" = com.bytekibble.acceptance
+test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$qa_app/Contents/Info.plist")" = com.mulabs.bytekibble.acceptance
 fixture=$(mktemp -d "$PWD/output/acceptance/ota.XXXXXX")
 mkdir -p "$fixture/installed" "$fixture/feed"
 for location in installed target; do

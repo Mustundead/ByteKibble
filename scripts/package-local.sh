@@ -5,8 +5,8 @@ cd "$(dirname "$0")/.."
 
 mode="${1:-release}"
 case "$mode" in
-  release) configuration=release; app_name=ByteKibble; bundle_id=com.bytekibble.app; extra=() ;;
-  qa) configuration=debug; app_name="ByteKibble QA"; bundle_id=com.bytekibble.acceptance; extra=(-Xswiftc -DBYTEKIBBLE_ACCEPTANCE) ;;
+  release) configuration=release; app_name=ByteKibble; bundle_id=com.mulabs.bytekibble; extra=() ;;
+  qa) configuration=debug; app_name="ByteKibble QA"; bundle_id=com.mulabs.bytekibble.acceptance; extra=(-Xswiftc -DBYTEKIBBLE_ACCEPTANCE) ;;
   *) printf 'Usage: %s [release|qa]\n' "$0" >&2; exit 2 ;;
 esac
 
@@ -60,7 +60,7 @@ done
 /usr/libexec/PlistBuddy -c 'Add :CFBundleIconName string ByteKibble' "$plist"
 if [ "$mode" = release ]; then
   /usr/libexec/PlistBuddy -c 'Add :LSUIElement bool true' "$plist"
-  /usr/libexec/PlistBuddy -c 'Add :SUFeedURL string https://raw.githubusercontent.com/mustundead/ByteKibble/main/docs/updates/preview.xml' "$plist"
+  /usr/libexec/PlistBuddy -c 'Add :SUFeedURL string https://raw.githubusercontent.com/mustundead/ByteKibble/main/docs/updates/mulabs.xml' "$plist"
   /usr/libexec/PlistBuddy -c 'Add :SUPublicEDKey string FFo6GQ0easmXdjP3wlXJCN9l/cD7jBHPT3SwXLA1yuY=' "$plist"
   /usr/libexec/PlistBuddy -c 'Add :SUEnableAutomaticChecks bool true' "$plist"
   /usr/libexec/PlistBuddy -c 'Add :SUAutomaticallyUpdate bool false' "$plist"

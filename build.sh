@@ -44,7 +44,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <dict>
     <key>CFBundleName</key><string>$APP_NAME</string>
     <key>CFBundleDisplayName</key><string>ByteKibble</string>
-    <key>CFBundleIdentifier</key><string>com.bytekibble.app</string>
+    <key>CFBundleIdentifier</key><string>com.mulabs.bytekibble</string>
     <key>CFBundleExecutable</key><string>$APP_NAME</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>$SHORT_VERSION</string>

@@ -127,6 +127,8 @@ struct AcceptanceHarness: View {
                 }.font(.caption)
                 HStack {
                     Button("Welcome preview") { showWelcome = true }
+                    Button("Popover preview") { menuPreview?.showScreenshotPreview() }
+                    Button("Sync preview") { SyncWindow.shared.show(vm: vm) }
                     Picker("Language", selection: $language) {
                         ForEach(["en", "zh-Hans", "zh-Hant", "ja", "ko"], id: \.self) { Text($0).tag($0) }
                     }

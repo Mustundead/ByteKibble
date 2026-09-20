@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import ByteKibbleCore
 
 @MainActor
 final class ViewModel: ObservableObject {
@@ -165,6 +166,12 @@ final class ViewModel: ObservableObject {
         var storageFailed = false
         let discovered = scan?() ?? Providers.scanAll(defaults: defaults, store: credentialStore, onStorageFailure: { storageFailed = true })
         targets = discovered
+        for index in targets.indices {
+            let target = targets[index]
+            if let record = transferredRecord(for: target) {
+                targets[index] = SubTarget(id: target.id, name: record.name, origin: target.origin, url: target.url, cached: target.cached)
+            }
+        }
         if storageFailed {
             storageFailure = L10n.t("无法访问钥匙串。原有订阅记录已保留，请解锁钥匙串后重试。")
         } else { storageFailure = nil }
@@ -237,6 +244,43 @@ final class ViewModel: ObservableObject {
         selectedID = targets.first(where: { $0.url == text })?.id ?? selectedID
         if automaticRefresh { Task { await refreshLive() } }
         return true
+    }
+    func transferredRecord(for target: SubTarget) -> SyncRecord? {
+        guard let data = defaults.data(forKey: "transfer." + Providers.persistenceID(target.url)) else { return nil }
+        return try? SyncRecord.decode(data)
+    }
+    func syncAccount(for url: String) -> String? { defaults.string(forKey: "sync.account." + Providers.persistenceID(url)) }
+    func markShared(_ url: String, account: String?) {
+        defaults.set(account, forKey: "sync.account." + Providers.persistenceID(url))
+    }
+    func manualReset(for target: SubTarget) -> Date? {
+        manualResetDates[Providers.persistenceID(Providers.dedupeKey(target.url))].map(Date.init(timeIntervalSince1970:))
+    }
+    func acceptTransferred(_ record: SyncRecord, url: URL, syncAccount: String? = nil) throws {
+        _ = try record.validated()
+        guard !isPreview else { throw SyncValidationError.invalidRecord }
+        let existed = targets.contains { $0.url == url.absoluteString }
+        if existed && (syncAccount == nil || self.syncAccount(for: url.absoluteString) != syncAccount) { return }
+        if !existed {
+            guard Providers.addCustom(url: url.absoluteString, defaults: defaults, store: credentialStore) else {
+                throw SyncValidationError.invalidRecord
+            }
+            rescan()
+        }
+        guard let index = targets.firstIndex(where: { $0.url == url.absoluteString }) else { throw SyncValidationError.invalidRecord }
+        let target = targets[index]
+        if let syncAccount { markShared(url.absoluteString, account: syncAccount) }
+        defaults.set(try record.encode(), forKey: "transfer." + Providers.persistenceID(target.url))
+        targets[index] = SubTarget(id: target.id, name: record.name, origin: target.origin, url: target.url, cached: target.cached)
+        if let reading = record.reading, let total = reading.total,
+           sample(for: target)?.fetchedAt.map({ $0 > reading.observed }) != true {
+            samples[target.id] = QuotaSample(uploaded: reading.upload, downloaded: reading.download, total: total,
+                                            expireAt: reading.expires, resetDay: nil, planName: nil,
+                                            fetchedAt: reading.observed, source: .cache, aggregateUsed: reading.used)
+        }
+        let key = Providers.persistenceID(Providers.dedupeKey(target.url))
+        manualResetDates[key] = record.reset?.timeIntervalSince1970
+        defaults.set(manualResetDates, forKey: Self.resetDatesKey)
     }
     func removeCustom(id: String) {
         guard !isPreview else { return }

@@ -13,9 +13,9 @@ final class AppUpdater: ObservableObject {
     func start() {
 #if BYTEKIBBLE_ACCEPTANCE
         guard CommandLine.arguments.contains("--updater-acceptance"),
-              Bundle.main.bundleIdentifier == "com.bytekibble.acceptance" else { return }
+              Bundle.main.bundleIdentifier == "com.mulabs.bytekibble.acceptance" else { return }
 #else
-        guard Bundle.main.bundleIdentifier == "com.bytekibble.app" else { return }
+        guard Bundle.main.bundleIdentifier == "com.mulabs.bytekibble" else { return }
 #endif
         guard controller == nil,
               Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") is String else { return }

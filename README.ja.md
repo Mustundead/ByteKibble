@@ -1,4 +1,4 @@
-> **build 50 公開**：キーチェーン移行、本文の 2 MiB 制限、再試行・キャンセルの改善、同一オリジンの HTTPS リダイレクト検証。独立したダミー契約で自動テスト 55 件と署名済み候補の実キーチェーン検証 11 件が成功しました。**Developer ID 署名済み、Apple 未公証です。** [検証範囲と残る制限](docs/security-hardening.md)。
+> **build 51 手動インストール用プレビュー**：読みやすい暖色寄りのグレー背景、控えめな同期アイコン、iCloud 権限のないビルドで同期画面を開くと終了する問題を修正しました。macOS Bundle ID は `com.mulabs.bytekibble` に変更され、**build 50 からの上書き更新ではありません**。既存のアプリとデータを残してください。移行は未検証です。この配布用 Mac パッケージでは iCloud 同期は有効ではなく、暗号化ファイルによる手動転送を利用できます。Developer ID 署名済み、**Apple 未公証**。[ダウンロードと詳細](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build51)。
 
 <p align="center">
   <img src="docs/assets/app-icon-light.png" width="128" height="128" alt="ByteKibble：肉球マーク入りの暖かなゴールドのフードバッグ">
@@ -11,7 +11,7 @@
 
 ByteKibble は、**残り通信量、使用量、契約の有効期限、リセットの予定**を確認できる macOS メニューバーアプリです。対応する Clash 系クライアントと SNTP の契約を自動検出し、Quantumult／Quantumult X、Surge で使う HTTPS サブスクリプション URL の手動追加と、Shadowsocks SIP008 の通信量フィールドに対応します。取得できる情報は提供元のデータによって異なります。詳しい条件は以下の対応範囲をご覧ください。
 
-> **1.2.0（50）プレリリース**：アプリのソース、初回起動時のウェルカム画面、Apple silicon（arm64）用パッケージを提供します。Developer ID で署名済みですが、**Apple の公証は受けていません**。[ダウンロードと更新内容](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)。`preview/` 内の画像は過去のバージョンです。
+> **1.2.0（51）プレリリース**：Apple silicon（arm64）用の手動インストールパッケージです。既存の build 50 ユーザーは上記の移行上の注意をご確認ください。[build 50 のダウンロード](https://github.com/mustundead/ByteKibble/releases/tag/v1.2.0-build50)は残します。`preview/` 内の画像は過去のバージョンです。
 
 **アプリ内更新（build 47 以降）：** 下部のバージョン番号から更新の確認や自動確認の無効化ができます。インストールには確認が必要です。build 46 以前は一度手動で更新してください。更新確認は GitHub に接続しますが、サブスクリプション URL や通信量は送信しません。プレビュー版は専用の更新フィードを使用します。
 
