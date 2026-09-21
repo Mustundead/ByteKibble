@@ -1,5 +1,8 @@
 // swift-tools-version:5.9
 import PackageDescription
+import Foundation
+
+let isAppStoreBuild = ProcessInfo.processInfo.environment["BYTEKIBBLE_APP_STORE"] == "1"
 
 let package = Package(
     name: "ByteKibble",
@@ -9,7 +12,7 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "ByteKibble",
-            dependencies: [.product(name: "Sparkle", package: "Sparkle"), .product(name: "ByteKibbleCore", package: "ByteKibbleCore")],
+            dependencies: (isAppStoreBuild ? [] : [.product(name: "Sparkle", package: "Sparkle")]) + [.product(name: "ByteKibbleCore", package: "ByteKibbleCore")],
             path: "Sources/ByteKibble",
             resources: [
                 .copy("Resources/QuotaBag.png"),

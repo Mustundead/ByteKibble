@@ -7,8 +7,8 @@ configuration=release
 app_name=ByteKibble
 bundle_id=com.mulabs.bytekibble
 scratch=.build-app-store
-swift build --scratch-path "$scratch" -c "$configuration" -Xswiftc -DBYTEKIBBLE_APP_STORE -j 2
-bin_path=$(swift build --scratch-path "$scratch" -c "$configuration" --show-bin-path -Xswiftc -DBYTEKIBBLE_APP_STORE)
+BYTEKIBBLE_APP_STORE=1 swift build --scratch-path "$scratch" -c "$configuration" -Xswiftc -DBYTEKIBBLE_APP_STORE -j 2
+bin_path=$(BYTEKIBBLE_APP_STORE=1 swift build --scratch-path "$scratch" -c "$configuration" --show-bin-path -Xswiftc -DBYTEKIBBLE_APP_STORE)
 test -f "$bin_path/ByteKibble"
 test -d "$bin_path/ByteKibble_ByteKibble.bundle"
 
