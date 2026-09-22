@@ -223,5 +223,11 @@
 "加密文件" = "Encrypted File";
 "文件和密钥，请分开保管" = "Keep the file and key separate";
 "了解手动传输" = "About Manual Transfer";
+"体验演示" = "Experience Demo";
+"查看示例流量、历史与导出，不读取真实订阅" = "Explore sample usage, history and export without reading a real subscription";
+"这是本机示例，用来了解 ByteKibble 的流量卡片、历史记录和导出功能。示例订阅的改动只保留在演示期间；主动导出的文件会按你选择的位置保留。" = "This local sample shows ByteKibble’s usage card, history and export. Changes to the sample subscription last only during the demo; files you explicitly export remain wherever you choose to save them.";
+"安全边界" = "Safety boundaries";
+"演示不会保存到钥匙串或本机记录，不会访问 iCloud、订阅链接、小组件、提醒或后台刷新。示例数字不是服务商返回的真实余额。" = "The demo does not save to Keychain or local records, and does not access iCloud, subscription links, widgets, reminders or background refresh. Sample numbers are not a provider balance.";
+"完成" = "Done";
 
 "先在 Mac 版 ByteKibble 中开启同步并选择订阅，再通过 iCloud 接收数据。" = "First turn on sync in ByteKibble for Mac and select subscriptions. Then receive them here through iCloud.";

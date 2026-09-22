@@ -41,6 +41,23 @@ final class MockSubscriptionProtocol: URLProtocol {
 }
 
 final class SecurityTests: XCTestCase {
+    @MainActor func testDemoStoreIsEphemeralAndHasNoRealSubscriptionAccess() async throws {
+        let store = SubscriptionStore(demo: true)
+        XCTAssertTrue(store.demo)
+        XCTAssertTrue(store.recordsAvailable)
+        let item = try XCTUnwrap(store.items.first)
+        XCTAssertEqual(item.name, String(localized: "演示订阅"))
+        XCTAssertEqual(item.reading?.total, 100 * 1_073_741_824)
+        XCTAssertEqual(item.reading?.used, 0)
+        let before = store.items
+        await store.refresh(item.id)
+        XCTAssertEqual(store.items, before, "演示刷新不得发起订阅请求或改变示例数据")
+        try store.rename("临时演示", id: item.id)
+        XCTAssertEqual(store.items.first?.name, "临时演示")
+        XCTAssertEqual(store.items.first?.reading?.total, item.reading?.total)
+        XCTAssertEqual(store.items.first?.history.count, item.history.count)
+    }
+
     func testQRImageDecoderRecognizesFixtureAndRejectsUnsafeImages() throws {
         let payload = "https://example.invalid/bytekibble-camera-acceptance"
         let generator = try XCTUnwrap(CIFilter(name: "CIQRCodeGenerator"))

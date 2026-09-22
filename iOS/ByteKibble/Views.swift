@@ -508,6 +508,14 @@ struct DetailView: View {
     var body: some View {
         if let item = store.items.first(where: { $0.id == id }) {
             List {
+                if store.demo {
+                    Section {
+                        Label("演示数据 · 不会查询真实订阅", systemImage: "eye")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.orange)
+                            .accessibilityIdentifier("demo.detail.banner")
+                    }
+                }
                 Section {
                     QuotaCard(item: item, error: store.errors[id], loading: store.loading.contains(id))
                         .listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
@@ -735,6 +743,7 @@ struct SyncRouteIllustration: View {
 
 struct SettingsView: View {
     @State private var showingWelcome = false
+    @State private var showingDemo = false
     @EnvironmentObject private var sync: SyncLibrary
     @Environment(WidgetSharing.self) private var widgets
     @Environment(ReminderSettings.self) private var reminders
@@ -799,6 +808,17 @@ struct SettingsView: View {
                 if let message = reminders.message { Label(message, systemImage: "exclamationmark.circle").font(.footnote).foregroundStyle(.secondary) }
             } header: { Text("提醒与刷新") }
             Section {
+                Button { showingDemo = true } label: {
+                    HStack(spacing: 12) {
+                        SettingsSymbol(name: "sparkles.rectangle.stack")
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("体验演示")
+                            Text("查看示例流量、历史与导出，不读取真实订阅")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                .accessibilityIdentifier("demo.entry")
                 Button { showingWelcome = true } label: {
                     HStack(spacing: 12) { SettingsSymbol(name: "hand.raised"); Text("使用说明与隐私") }
                 }
@@ -832,5 +852,54 @@ struct SettingsView: View {
             }
         }.navigationTitle("设置").task { await reminders.checkPermission() }
             .sheet(isPresented: $showingWelcome) { WelcomeView(finish: { showingWelcome = false }) }
+            .sheet(isPresented: $showingDemo) { DemoExperienceView() }
+    }
+}
+
+/// A reviewable, production-visible demonstration that never shares the real store.
+/// The synthetic store has no file URL, never touches Keychain, and is not injected
+/// into SyncLibrary, reminders, widgets, or background refresh.
+struct DemoExperienceView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var store = SubscriptionStore(demo: true)
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Label("演示数据 · 不会查询真实订阅", systemImage: "eye")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.orange)
+                        .accessibilityIdentifier("demo.banner")
+                    Text("这是本机示例，用来了解 ByteKibble 的流量卡片、历史记录和导出功能。示例订阅的改动只保留在演示期间；主动导出的文件会按你选择的位置保留。")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    ForEach(store.items) { item in
+                        NavigationLink { DetailView(id: item.id) } label: {
+                            QuotaCard(item: item, error: nil, loading: false)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("安全边界", systemImage: "lock.shield")
+                            .font(.headline)
+                        Text("演示不会保存到钥匙串或本机记录，不会访问 iCloud、订阅链接、小组件、提醒或后台刷新。示例数字不是服务商返回的真实余额。")
+                            .font(.footnote).foregroundStyle(.secondary)
+                    }
+                    .padding(16)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+                }
+                .padding(20)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("体验演示")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("完成") { dismiss() }.accessibilityIdentifier("demo.exit")
+                }
+            }
+        }
+        .environment(store)
     }
 }

@@ -5,6 +5,7 @@
 .build-audit-core/
 .build-test-bundle-id/
 .build-app-store/
+.build-app-store-*/
 Packages/**/.build/
 output/
 dist/

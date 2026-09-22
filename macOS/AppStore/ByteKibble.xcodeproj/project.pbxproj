@@ -1,0 +1,32 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+		A10000000000000000000001 = {isa = PBXBuildFile; fileRef = A10000000000000000000002; };
+		A10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivePlaceholder.swift; sourceTree = "<group>"; };
+		A10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000004 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ByteKibble.app; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		A10000000000000000000005 = {isa = PBXGroup; children = (A10000000000000000000002, A10000000000000000000003, A10000000000000000000006); sourceTree = "<group>"; };
+		A10000000000000000000006 = {isa = PBXGroup; children = (A10000000000000000000004); name = Products; sourceTree = "<group>"; };
+
+		A10000000000000000000007 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000001); runOnlyForDeploymentPostprocessing = 0; };
+		A10000000000000000000008 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A10000000000000000000009 = {isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); name = "Embed SwiftPM product and resources"; outputPaths = (); runOnlyForDeploymentPostprocessing = 0; shellPath = /bin/bash; shellScript = "set -euo pipefail\nrepo=\"$SRCROOT/../..\"\nscratch=\"$TEMP_DIR/ByteKibbleAppStoreSPM\"\ncd \"$repo\"\nBYTEKIBBLE_APP_STORE=1 swift build --scratch-path \"$scratch\" -c release --arch arm64 --arch x86_64 -Xswiftc -DBYTEKIBBLE_APP_STORE -j 2\nbin_path=$(BYTEKIBBLE_APP_STORE=1 swift build --scratch-path \"$scratch\" -c release --arch arm64 --arch x86_64 --show-bin-path -Xswiftc -DBYTEKIBBLE_APP_STORE)\ntest -f \"$bin_path/ByteKibble\"\ntest -d \"$bin_path/ByteKibble_ByteKibble.bundle\"\napp=\"$TARGET_BUILD_DIR/$WRAPPER_NAME\"\ncp \"$bin_path/ByteKibble\" \"$app/Contents/MacOS/$EXECUTABLE_NAME\"\nditto \"$bin_path/ByteKibble_ByteKibble.bundle\" \"$app/Contents/Resources/ByteKibble_ByteKibble.bundle\"\nbash \"$repo/scripts/compile-icon.sh\" \"$app/Contents/Resources\"\n"; };
+
+		A10000000000000000000010 = {isa = PBXNativeTarget; buildConfigurationList = A10000000000000000000011; buildPhases = (A10000000000000000000007, A10000000000000000000008, A10000000000000000000009); buildRules = (); dependencies = (); name = ByteKibble; productName = ByteKibble; productReference = A10000000000000000000004; productType = "com.apple.product-type.application"; };
+		A10000000000000000000011 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000012, A10000000000000000000013); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A10000000000000000000014 = {isa = XCConfigurationList; buildConfigurations = (A10000000000000000000015, A10000000000000000000016); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+
+		A10000000000000000000012 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 51; DEVELOPMENT_TEAM = 46P646AZCB; INFOPLIST_FILE = Info.plist; MACOSX_DEPLOYMENT_TARGET = 13.0; MARKETING_VERSION = 1.2.0; PRODUCT_BUNDLE_IDENTIFIER = com.mulabs.bytekibble.ios; PRODUCT_NAME = ByteKibble; SDKROOT = macosx; SWIFT_VERSION = 5.0; CODE_SIGN_ENTITLEMENTS = ByteKibble.entitlements; ENABLE_HARDENED_RUNTIME = YES; }; name = Debug; };
+		A10000000000000000000013 = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 51; DEVELOPMENT_TEAM = 46P646AZCB; INFOPLIST_FILE = Info.plist; MACOSX_DEPLOYMENT_TARGET = 13.0; MARKETING_VERSION = 1.2.0; PRODUCT_BUNDLE_IDENTIFIER = com.mulabs.bytekibble.ios; PRODUCT_NAME = ByteKibble; SDKROOT = macosx; SWIFT_VERSION = 5.0; CODE_SIGN_ENTITLEMENTS = ByteKibble.entitlements; ENABLE_HARDENED_RUNTIME = YES; }; name = Release; };
+		A10000000000000000000015 = {isa = XCBuildConfiguration; buildSettings = {MACOSX_DEPLOYMENT_TARGET = 13.0; SDKROOT = macosx; }; name = Debug; };
+		A10000000000000000000016 = {isa = XCBuildConfiguration; buildSettings = {MACOSX_DEPLOYMENT_TARGET = 13.0; SDKROOT = macosx; }; name = Release; };
+
+		A10000000000000000000017 = {isa = PBXProject; attributes = {LastUpgradeCheck = 1600; TargetAttributes = {A10000000000000000000010 = {CreatedOnToolsVersion = 16.0;};};}; buildConfigurationList = A10000000000000000000014; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = A10000000000000000000005; productRefGroup = A10000000000000000000006; projectDirPath = ""; projectRoot = ""; targets = (A10000000000000000000010); };
+	};
+	rootObject = A10000000000000000000017;
+}

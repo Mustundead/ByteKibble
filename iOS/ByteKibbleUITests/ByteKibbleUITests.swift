@@ -1,6 +1,24 @@
 import XCTest
 
 final class ByteKibbleUITests: XCTestCase {
+    func testProductionDemoEntryIsIsolatedAndDismissible() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US", "-welcome.completed", "YES"]
+        app.launch()
+        app.tabBars.buttons["Settings"].tap()
+        let entry = app.buttons["demo.entry"]
+        XCTAssertTrue(entry.waitForExistence(timeout: 6))
+        entry.tap()
+        XCTAssertTrue(app.staticTexts["Demo data · no real subscriptions are queried"].waitForExistence(timeout: 5))
+        let subscription = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Demo Subscription")).firstMatch
+        XCTAssertTrue(subscription.waitForExistence(timeout: 5))
+        subscription.tap()
+        XCTAssertTrue(app.staticTexts["Demo data · no real subscriptions are queried"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Done"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+    }
+
     func testPhysicalCameraSessionCanReturnWithoutImport() throws {
         #if targetEnvironment(simulator)
         throw XCTSkip("Requires an available physical camera")
